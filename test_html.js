@@ -1,4 +1,4 @@
-/* Suite jsdom per simulatore_dirigente.html — preset Zucchetti + scenari addizionali + sanity. */
+/* Suite jsdom per simulatore_dirigente.html — mese standard 26 GG, KPI netto = annuale/14, scenari + sanity. */
 const fs = require('fs');
 const path = require('path');
 const { JSDOM } = require('/tmp/node_modules/jsdom');
@@ -29,6 +29,7 @@ function cellValue(tableId, labelPart, col = 1){
 
 function set(id, value){
   const el = document.getElementById(id);
+  if (!el) throw new Error('input inesistente: ' + id);
   el.value = value;
   el.dispatchEvent(new window.Event('input', { bubbles: true }));
 }
@@ -41,28 +42,31 @@ check('numero enti regionali nel menu', get('regione').options.length, 21, 0);
 check('default regione', get('regione').value, 'Lazio');
 check('default comune', get('comune').value, 'Roma');
 check('righe confronto minimi CCNL (header + 3 anni)', get('confronto').rows.length - 1, 3, 0);
-check('label SUP.CONTR chiara (minimo contrattuale, NON superminimo)', /minimo contrattuale/i.test(get('supc').labels[0].textContent) && /non \u00e8 un superminimo|NON è un superminimo/i.test(get('supc').labels[0].textContent) ? 1 : 0, 1, 0);
+check('label SUP.CONTR chiara (minimo contrattuale, NON superminimo)', /minimo contrattuale/i.test(get('supc').labels[0].textContent) && /non \u00e8 un superminimo|NON \u00e8 un superminimo/i.test(get('supc').labels[0].textContent) ? 1 : 0, 1, 0);
 check('label S.MINIMO chiara (personale)', /personale/i.test(get('supi').labels[0].textContent) ? 1 : 0, 1, 0);
+check('input giorni rimossi (mese fisso 26 GG)', (get('ggRet') || get('ggFer') || get('ggFest')) ? 0 : 1, 1, 0);
 
-/* scenario 1: preset identico al cedolino Zucchetti (dirigente Liv. 5, GG 25+1+1, Lazio/Roma, override conguaglio) */
-check('mensile: retribuzione 25 gg', rowValue('mensile', 'Retribuzione ('), 7677.20);
-check('mensile: TOTALE COMPETENZE', rowValue('mensile', '= TOTALE COMPETENZE'), 8291.38);
-check('mensile: IVS 9,19% (ROUND euro 8.291,00)', val('mensile', 'Contributo IVS 9,19%'), 761.94);
-check('mensile: IVS agg. 1%', val('mensile', 'IVS agg. 1%'), 36.06);
+/* scenario 1: default = mese pieno standard 26 GG, retribuzione cedolino 01, Lazio/Roma, nessun override */
+check('mensile: retribuzione 26 gg', rowValue('mensile', 'Retribuzione ('), 7984.29);
+check('mensile: nessuna riga ferie/festivita', isNaN(rowValue('mensile', 'Ferie')) && isNaN(rowValue('mensile', 'Festivit\u00e0')) ? 1 : 0, 1, 0);
+check('mensile: TOTALE COMPETENZE', rowValue('mensile', '= TOTALE COMPETENZE'), 7984.29);
+check('mensile: IVS 9,19% (ROUND euro 7.984,00)', val('mensile', 'Contributo IVS 9,19%'), 733.73);
+check('mensile: IVS agg. 1%', val('mensile', 'IVS agg. 1%'), 32.99);
 check('mensile: Fondo Mario Negri 2%', val('mensile', 'Fondo Mario Negri 2%'), 98.71);
 check('mensile: FASDAC 1,87%', val('mensile', 'FASDAC 1,87%'), 71.59);
 check('mensile: A. Pastore dirigente', val('mensile', 'A. Pastore quota dirigente'), 38.73);
 check('mensile: formazione Mario Negri', val('mensile', 'Fondo formazione Mario Negri'), 10.83);
-check('mensile: IRPEF lorda (override cedolino)', val('mensile', 'IRPEF lorda'), 2755.77);
-check('mensile: add. regionale residuo', val('mensile', 'Addizionale regionale'), 253.95);
-check('mensile: add. comunale residuo', val('mensile', 'Addizionale comunale'), 52.97);
-check('mensile: acconto addizionali', val('mensile', 'Acconto addizionali'), 27.33);
-check('mensile: arrotondamento trattenute', val('mensile', 'Arrotondamento trattenute'), 0.03);
-check('mensile: TOTALE TRATTENUTE', rowValue('mensile', '= TOTALE TRATTENUTE'), 4107.91);
-check('mensile: NETTO DEL MESE (cedolino)', rowValue('mensile', '= NETTO DEL MESE'), 4184.00);
-check('kpi: netto del mese', kpi('kpiNettoM'), 4184.00);
-check('kpi: totale trattenute', kpi('kpiTratt'), 4107.91);
+check('mensile: IRPEF lorda (annua/14)', val('mensile', 'IRPEF lorda'), 2557.41);
+check('mensile: add. regionale annua/12', val('mensile', 'Addizionale regionale'), 261.40);
+check('mensile: add. comunale annua/12', val('mensile', 'Addizionale comunale'), 76.05);
+check('mensile: TOTALE TRATTENUTE', rowValue('mensile', '= TOTALE TRATTENUTE'), 3881.44);
+check('mensile: NETTO DEL MESE (payslip, addizionali/12)', rowValue('mensile', '= NETTO DEL MESE'), 4102.85);
+check('mensile: fringe benefit del mese (info)', val('mensile', 'Fringe benefit del mese'), 136.40);
+check('kpi: netto mensile medio (annuale/14)', kpi('kpiNettoM'), 4175.74);
+check('kpi: nota = netto annuale / 14', get('kpiNote').textContent.includes('58.460,33') && get('kpiNote').textContent.includes('14') ? 1 : 0, 1, 0);
+check('kpi: totale trattenute del mese (payslip)', kpi('kpiTratt'), 3881.44);
 check('kpi: RAL 14 mensilita', kpi('kpiRAL'), 111780.00);
+check('kpi: netto annuo in busta', kpi('kpiNettoA'), 58460.33);
 check('annuale: RME', rowValue('annuale', 'RME \u2014 retribuzione mensile'), 7984.29);
 check('annuale: retr. base di contratto CCNL', rowValue('annuale', 'Retr. base di contratto'), 88584.72);
 check('annuale: superminimo individuale annuo', rowValue('annuale', 'Superminimo individuale'), 23195.28);
@@ -82,58 +86,45 @@ check('annuale: addizionale comunale Roma', rowValue('annuale', 'Addizionale com
 check('annuale: NETTO ANNUO in busta', rowValue('annuale', 'NETTO ANNUO in busta'), 58460.33);
 check('annuale: netto medio per mensilita', rowValue('annuale', 'Netto medio per mensilit'), 4175.74);
 
-/* scenario 1bis: cedolino 03 (dirigente 03, RME 12.857,14: supc=0, supi=7.847,14, 26gg+1 fest., autovettura incassata) */
-['supc', 'supi', 'scatti', 'ggRet', 'ggFer', 'ggFest', 'fringe', 'fringeCash',
+/* scenario 1bis: stile cedolino 03 (supc=0, supi=7.847,14, autovettura in denaro 261,30, mese pieno 26 GG) */
+['supc', 'supi', 'scatti', 'fringe', 'fringeCash',
  'irpOv', 'regRes', 'comRes', 'acconto', 'arrotT', 'arrotN'].forEach(id => set(id, '0'));
-set('supi', '7847.14'); set('ggRet', '26'); set('ggFest', '1'); set('fringeCash', '261.30');
-set('irpOv', '4810.85'); set('regRes', '345.82'); set('comRes', '64.12');
-set('acconto', '36.43'); set('arrotT', '0.14'); set('arrotN', '0.58');
+set('supi', '7847.14'); set('fringeCash', '261.30');
 check('ced.03: retribuzione 26 gg 494,50538', rowValue('mensile', 'Retribuzione ('), 12857.14);
-check('ced.03: festivita non goduta 494,51', val('mensile', 'Festività/permessi'), 494.51);
-check('ced.03: indennità autovettura in denaro', val('mensile', 'Indennità personale in denaro'), 261.30);
-check('ced.03: TOTALE COMPETENZE 13.612,95', rowValue('mensile', '= TOTALE COMPETENZE'), 13612.95);
-check('ced.03: IVS 1.251,03 su base arrotondata 13.613,00 (cedolino 1.251,04, scarto 0,01 in ZP9960)', val('mensile', 'Contributo IVS 9,19%'), 1251.03);
-check('ced.03: IVS agg. 1% 89,28', val('mensile', 'IVS agg. 1%'), 89.28);
-check('ced.03: IRPEF lorda override', val('mensile', 'IRPEF lorda'), 4810.85);
-check('ced.03: add. regionale 345,82', val('mensile', 'Addizionale regionale'), 345.82);
-check('ced.03: TOTALE TRATTENUTE 6.817,53', rowValue('mensile', '= TOTALE TRATTENUTE'), 6817.53);
-check('ced.03: NETTO DEL MESE 6.796,00', rowValue('mensile', '= NETTO DEL MESE'), 6796.00);
-check('ced.03: kpi netto', kpi('kpiNettoM'), 6796.00);
+check('ced.03: indennit\u00e0 autovettura in denaro', val('mensile', 'Indennit\u00e0 personale in denaro'), 261.30);
+check('ced.03: TOTALE COMPETENZE 13.118,44', rowValue('mensile', '= TOTALE COMPETENZE'), 13118.44);
+check('ced.03: IVS 1.205,54 su base arrotondata 13.118,00', val('mensile', 'Contributo IVS 9,19%'), 1205.54);
+check('ced.03: IVS agg. 1% 84,33', val('mensile', 'IVS agg. 1%'), 84.33);
+check('ced.03: IRPEF lorda annua/14', val('mensile', 'IRPEF lorda'), 4665.87);
+check('ced.03: add. regionale annua/12', val('mensile', 'Addizionale regionale'), 451.89);
+check('ced.03: TOTALE TRATTENUTE 6.755,03', rowValue('mensile', '= TOTALE TRATTENUTE'), 6755.03);
+check('ced.03: NETTO DEL MESE (payslip)', rowValue('mensile', '= NETTO DEL MESE'), 6363.41);
+check('ced.03: kpi netto mensile medio (93.186,70/14)', kpi('kpiNettoM'), 6656.19);
 check('ced.03: kpi RAL 179.999,96', kpi('kpiRAL'), 179999.96);
+check('ced.03: kpi netto annuo 93.186,70', kpi('kpiNettoA'), 93186.70);
 check('ced.03: RAL base di contratto 70.140,00', rowValue('annuale', 'Retr. base di contratto'), 70140.00);
 check('ced.03: superminimo individuale annuo 109.859,96', rowValue('annuale', 'Superminimo individuale'), 109859.96);
 check('ced.03: RAL effettiva 179.999,96', rowValue('annuale', 'RAL \u2014 retribuzione annua effettiva'), 179999.96);
 
-/* scenario 2: mese pulito senza conguagli (override a 0, GG come cedolino) */
-['irpOv', 'regRes', 'comRes', 'acconto', 'arrotT', 'arrotN'].forEach(id => set(id, '0'));
-set('supc', '1317.48'); set('supi', '1656.80572'); set('ggRet', '25'); set('ggFer', '1');
-set('ggFest', '1'); set('fringe', '136.4'); set('fringeCash', '0');
-check('pulito: TRATTENUTE', rowValue('mensile', '= TOTALE TRATTENUTE'), 3912.72);
-check('pulito: IRPEF lorda annua/14', val('mensile', 'IRPEF lorda'), 2557.41);
-check('pulito: add. regionale annua/12', val('mensile', 'Addizionale regionale'), 261.40);
-check('pulito: add. comunale annua/12', val('mensile', 'Addizionale comunale'), 76.05);
-check('pulito: NETTO DEL MESE', rowValue('mensile', '= NETTO DEL MESE'), 4378.66);
-check('pulito: kpi netto del mese', kpi('kpiNettoM'), 4378.66);
+/* scenario 2: ritorno ai default (retribuzione cedolino 01) + anno 2027 (minimo 4.920) */
+['supc', 'supi', 'scatti', 'fringe', 'fringeCash',
+ 'irpOv', 'regRes', 'comRes', 'acconto', 'arrotT', 'arrotN'].forEach(id => set(id, '0'));
+set('supc', '1317.48'); set('supi', '1656.80572'); set('fringe', '136.4'); set('fringeCash', '0');
+set('anno', '2027');
+check('2027: TOTALE COMPETENZE (RME 8.244,29)', rowValue('mensile', '= TOTALE COMPETENZE'), 8244.29);
+check('2027: NETTO DEL MESE (payslip)', rowValue('mensile', '= NETTO DEL MESE'), 4224.43);
+check('2027: TOTALE TRATTENUTE', val('mensile', '= TOTALE TRATTENUTE'), 4019.86);
+check('2027: NETTO ANNUO in busta', rowValue('annuale', 'NETTO ANNUO in busta'), 60185.43);
+check('2027: kpi netto mensile medio (60.185,43/14)', kpi('kpiNettoM'), 4298.96);
 
-/* scenario 3: mese pieno 26 gg senza fringe, senza conguagli */
-set('ggRet', '26'); set('ggFer', '0'); set('ggFest', '0'); set('fringe', '0');
-check('26 gg: TOTALE COMPETENZE = RME', rowValue('mensile', '= TOTALE COMPETENZE'), 7984.29);
-check('26 gg: NETTO DEL MESE', rowValue('mensile', '= NETTO DEL MESE'), 4158.89);
-check('26 gg: NETTO ANNUO in busta', rowValue('annuale', 'NETTO ANNUO in busta'), 59233.39);
-
-/* scenario 4: Lombardia/Milano, mese pulito 25+1+1 */
-set('ggRet', '25'); set('ggFer', '1'); set('ggFest', '1'); set('fringe', '136.4');
-set('regione', 'Lombardia');
-set('comune', 'Milano');
-check('Lombardia/Milano: NETTO DEL MESE', rowValue('mensile', '= NETTO DEL MESE'), 4510.38);
+/* scenario 3: Lombardia/Milano, anno 2026, mese pieno standard */
+set('anno', '2026'); set('regione', 'Lombardia'); set('comune', 'Milano');
+check('Lombardia/Milano: NETTO DEL MESE (payslip)', rowValue('mensile', '= NETTO DEL MESE'), 4234.57);
 check('Lombardia/Milano: add. regionale annua', rowValue('annuale', 'Addizionale regionale annua'), 1657.59);
 check('Lombardia/Milano: add. comunale annua', rowValue('annuale', 'Addizionale comunale annua'), 811.23);
-
-/* scenario 5: anno 2027 (minimo 4.920), Lazio/Roma */
-set('regione', 'Lazio'); set('comune', 'Roma'); set('anno', '2027');
-check('2027 pulito: NETTO ANNUO in busta', rowValue('annuale', 'NETTO ANNUO in busta'), 60185.43);
-check('2027 pulito: NETTO DEL MESE', rowValue('mensile', '= NETTO DEL MESE'), 4509.21);
-check('2027 pulito: TOTALE TRATTENUTE', val('mensile', '= TOTALE TRATTENUTE'), 4052.17);
+check('Lombardia/Milano: kpi netto mensile medio (60.040,90/14)', kpi('kpiNettoM'), 4288.64);
+set('regione', 'Lazio'); set('comune', 'Roma');
+check('ritorno Lazio/Roma: kpi netto mensile medio', kpi('kpiNettoM'), 4175.74);
 
 /* sanity: nessun NaN/undefined/Infinity nelle tabelle e nei KPI */
 let bad = 0;
