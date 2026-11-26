@@ -280,6 +280,9 @@ CASES = [
     dict(nome="superminimo ad personam 2.500/mese (mese pieno, pulito)", case=dict(
         supi=2500.0, ggRet=26, ggFer=0, ggFest=0, fringe=0.0, ov=0, regRes=0,
         comRes=0, acconto=0, arrotT=0, arrotN=0)),
+    dict(nome="fringe benefit 100/mese x 12 (mese pieno, pulito)", case=dict(
+        fringe=100.0, ggRet=26, ggFer=0, ggFest=0, ov=0, regRes=0,
+        comRes=0, acconto=0, arrotT=0, arrotN=0)),
     dict(nome="cedolino 03 (dirigente 03: RME 12.857, autovettura)", case=dict(
         supc=0.0, supi=7847.14, ggRet=26, ggFer=0, ggFest=1, fringe=0.0, fringeCash=261.30,
         ov=4810.85, regRes=345.82, comRes=64.12, acconto=36.43, arrotT=0.13, arrotN=0.58)),

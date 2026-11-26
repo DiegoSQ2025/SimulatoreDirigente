@@ -93,7 +93,7 @@ node test_html.js             # suite jsdom sull'HTML
 
 ## Verifica operativa
 
-`python3 test_simulatore.py` → **TUTTI I TEST PASSATI** (14 casi, 420 confronti cella per cella, 12 soglie addizionali, 38 verifiche Zucchetti: 20 sul cedolino 01 + 18 sul cedolino 03; i casi includono superminimo ad personam a 1.000/1.500/2.500 €/mese).
+`python3 test_simulatore.py` → **TUTTI I TEST PASSATI** (15 casi, 450 confronti cella per cella, 12 soglie addizionali, 38 verifiche Zucchetti: 20 sul cedolino 01 + 18 sul cedolino 03; i casi includono superminimo ad personam a 1.000/1.500/2.500 €/mese).
 `node test_html.js` → **TUTTI I TEST HTML PASSATI** (preset cedolino 01, scenario cedolino 03, mese pulito, 26 gg, Lombardia/Milano, anno 2027, sanity NaN, accessibilità label).
 
 Benchmark (2026 Lazio/Roma, GG 25+1+1, fringe 136,40): preset cedolino netto **4.184,00**; senza conguagli netto 4.378,66 (IRPEF 2.557,41 = annua/14, addizionali rateizzate /12); mese pieno 26 gg netto 4.158,89, netto annuo 59.233,39; default RAL 111.780 → netto annuo 58.460,33 (4.175,74/mese); 2027: 60.185,43; 2028: 61.645,12.
