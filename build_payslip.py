@@ -409,7 +409,7 @@ r = put(ws, r, "S.MINIMO \u2014 superminimo individuale (mensile)", 1656.80572, 
 c_supi = r - 1
 r = put(ws, r, "Scatti pre-2004 (mensile)", 0.0, "art. 9 TU: abrogati dal 2004; qui 0 di default", MONEY, True)
 c_scatti = r - 1
-r = put(ws, r, "RME \u2014 retribuzione mensile effettiva", f"=B{c_minimo}+B{c_supc}+B{c_smm}+B{c_supi}+B{c_scatti}", "", MONEY, True)
+r = put(ws, r, "RME \u2014 retribuzione mensile effettiva", f"=B{c_minimo}+B{c_supc}+B{c_smm}+B{c_supi}+B{c_scatti}", "", MONEY, False, True)
 c_rme = r - 1
 r = put(ws, r, "Retribuzione giornaliera (RME/26, art. 4 c. 6 TU)", f"=$B${c_rme}/{P['NG']}", "cedolino: 307,08791", MONEY)
 c_giorn = r - 1
