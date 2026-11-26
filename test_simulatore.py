@@ -365,6 +365,52 @@ CED03 = [
     ("ced.03: imponibile IRPEF annuo (RLD + autovettura x 12) = 170.051,45 (1% IVS capato al massimale)", "imp", 170051.45),
 ]
 
+# Terzo benchmark: elaborazione di controllo di un gestionale paghe (gennaio 2027,
+# visuale annua, superminimo retro-ingegnerizzato per netto annuo target 44.000,00).
+# Stesse regole condivise, struttura ridotta: SENZA FASDAC, SENZA Pastore, SENZA
+# detrazione art. 13, formazione non annualizzata (10,83 in totale).
+D_SIM27 = dict(anno=2027, supc=0.0, smm=0.0, supi=550.11117, ggRet=26, ggFer=0,
+               ggFest=0, fringe=0.0, fringeCash=0.0, ov=0.0, regRes=0.0, comRes=0.0,
+               acconto=0.0, arrotT=0.0, arrotN=0.0, oneri=0.0,
+               regione="Lazio", comune="Roma")
+SIM27 = [
+    ("sim27: RME 5.470,11 (4.920 + 550,11117)", "RME", 5470.11),
+    ("sim27: RAL 76.581,56 = rate x 14 (allegato 76.581,55)", "RAL", 76581.56),
+    ("sim27: RAL base contratto 4.920 x 14 = 68.880,00", "ralBase", 68880.00),
+    ("sim27: superminimo ad personam annuo 7.701,56", "supiA", 7701.56),
+    ("sim27: IVS 9,19% annua 7.037,85 (allegato 7.037,89 su base annua arrotondata)", "ivsA", 7037.85),
+    ("sim27: IVS agg. 1% annua 203,58 (76.582 - 56.224)", "aggA", 203.58),
+    ("sim27: Fondo Mario Negri 2% annuo 1.184,49", "negriA", 1184.49),
+    ("sim27: RLD 68.155,64 (allegato 68.144,76: deduce anche formazione 10,83)", "rld", 68155.64),
+    ("sim27: IRPEF lorda annua 21.506,93 (scaglioni 23/33/43)", "irpl", 21506.93),
+    ("sim27: detrazione art. 13 522,91 (RLD < 75.000: l'allegato NON la applica)", "ded", 522.91),
+    ("sim27: IRPEF netta annua 20.984,02", "irpn", 20984.02),
+    ("sim27: add. regionale annua 2.029,58 (regola marg Lazio)", "regA", 2029.58),
+    ("sim27: add. comunale annua 613,40 (Roma 0,90%)", "comA", 613.40),
+    ("sim27: netto annuo modello completo 43.074,79 (allegato 44.000 con struttura ridotta)", "nettoA", 43074.79),
+]
+# Verifiche sulla STRUTTURA dell'allegato (stesso imponibile, sue omissioni):
+# riproduce esattamente i suoi numeri con le nostre formule condivise.
+SIM27_ALLEGATO = [
+    ("sim27 allegato: IRPEF lorda 23/33/43 su imponibile 68.144,76 = 21.502,25",
+     scaglioni(68144.76), 21502.25),
+    ("sim27 allegato: add. regionale marg Lazio su 68.144,76 = 2.029,22",
+     ADL.addizionale_regionale(68144.76, "Lazio"), 2029.22),
+    ("sim27 allegato: add. comunale Roma 0,90% su 68.144,76 = 613,30",
+     ADL.addizionale_comunale(68144.76, "Lazio", "Roma"), 613.30),
+    ("sim27 allegato: IVS 9,19% su base annua arrotondata 76.582 = 7.037,89",
+     round(76582 * 0.0919, 2), 7037.89),
+    ("sim27 allegato: IVS agg. 1% su 76.582 - 56.224 = 203,58",
+     round((76582 - 56224) * 0.01, 2), 203.58),
+    ("sim27 allegato: TFR quota anno 76.581,55 / 13,5 = 5.672,71",
+     round(76581.55 / 13.5, 2), 5672.71),
+]
+_NETTO_ALLEGATO = round(76581.55638 - (7037.89 + 203.58 + 1184.49 + 10.83
+                                       + 21502.25 + 2029.22 + 613.30), 2)
+SIM27_ALLEGATO.append(
+    ("sim27 allegato: TOTALE TRATTENUTE sua struttura -> netto 44.000,00",
+     _NETTO_ALLEGATO, 44000.00))
+
 
 def main():
     rows = find_rows()
@@ -416,17 +462,35 @@ def main():
         else:
             print(f"  OK   {nome} = {refz3[k]:.2f}")
 
+    refsim = py_calc(**D_SIM27)
+    for nome, k, exp in SIM27:
+        if abs(refsim[k] - exp) > TOLL:
+            fails.append(f"{nome}: got={refsim[k]:.2f} exp={exp:.2f}")
+            print(f"  FAIL {nome}")
+        else:
+            print(f"  OK   {nome} = {refsim[k]:.2f}")
+
+    for nome, got, exp in SIM27_ALLEGATO:
+        if abs(got - exp) > TOLL:
+            fails.append(f"{nome}: got={got:.2f} exp={exp:.2f}")
+            print(f"  FAIL {nome}")
+        else:
+            print(f"  OK   {nome} = {got:.2f}")
+
     print()
     if fails:
         print(f"ESITO: {len(fails)} FALLIMENTI ({len(CASES)} casi x {len(OUT_LABELS)} "
               f"confronti, {tot_checked} totale; {len(SOGLIE)} soglie; "
-              f"{len(CED01)+len(CED03)} verifiche cedolini reali)")
+              f"{len(CED01)+len(CED03)+len(SIM27)+len(SIM27_ALLEGATO)} "
+              f"verifiche benchmark reali)")
         for f in fails:
             print(" -", f)
         return 1
     print(f"ESITO: TUTTI I TEST PASSATI ({len(CASES)} casi, {tot_checked} confronti "
           f"cella per cella tolleranza {TOLL} \u20ac, {len(SOGLIE)} soglie, "
-          f"{len(CED01)+len(CED03)} verifiche cedolini reali)")
+          f"{len(CED01)+len(CED03)+len(SIM27)+len(SIM27_ALLEGATO)} "
+          f"verifiche benchmark reali: {len(CED01)} ced.01 + {len(CED03)} ced.03 "
+          f"+ {len(SIM27)+len(SIM27_ALLEGATO)} elab. controllo 2027 netto 44.000)")
 
     print()
     print("=== BENCHMARK (2026, GG 25+1+1 come cedolino, senza override) ===")

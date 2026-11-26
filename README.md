@@ -66,6 +66,16 @@ Il modello si replica **al centesimo** anche sul cedolino di un secondo dirigent
 Nel simulatore HTML: superminimo ad personam = 7.847,14 (AUM.RETR. + S.MINIMO + Ad Pers.), SMM 350, indennità denaro 261,30 (in Excel/py: supc=0, supi=7847.14),
 override IRPEF lorda 4.810,85, residui 345,82/64,12, acconto 36,43, arrotondamenti 0,14/0,58.
 
+## Terzo benchmark — elaborazione di controllo gennaio 2027 (netto target 44.000)
+
+Un'elaborazione di controllo di un gestionale paghe (gennaio 2027, visuale annua, superminimo retro-ingegnerizzato 550,11117 per arrivare a netto annuo 44.000) conferma **tutte le regole condivise**:
+
+- RAL **76.581,55** = rate 5.470,11117 × 14 (minimo 2027 4.920 + superminimo ad personam) ✓; 13ª e 14ª = retribuzione mensile ✓; TFR quota anno 5.672,71 = retrib. utile ÷ 13,5 ✓;
+- IVS 9,19% su base annua arrotondata 76.582 = **7.037,89** ✓; agg. 1% su 20.358 = **203,58** ✓; Mario Negri 2% = **1.184,49** ✓;
+- **IRPEF lorda 21.502,25** = esattamente scaglioni 23/33/43 sul suo imponibile 68.144,76 ✓; add. regionale Lazio (regola marg) **2.029,22** ✓ e add. comunale Roma 0,90% **613,30** ✓ al centesimo — terza validazione indipendente del motore addizionali.
+
+Differenze strutturali dell'elaborazione (documentate, non errori nostri): **senza FASDAC** (859,08/anno) e **senza Pastore** (464,81/anno) — voci presenti in entrambi i cedolini reali; **senza detrazione art. 13** pur con RLD 68.144,76 < 75.000 (522,91 € a suo favore); formazione Negri non annualizzata (10,83 in totale vs 129,96). Il suo netto 44.000 vs il nostro 43.074,79 con gli stessi input si spiega al centesimo con queste tre omissioni. Con il modello completo, per un netto annuo di 44.000 serve un superminimo ad personam di **713,16 €/mese** (RAL 78.864,25).
+
 ## Struttura dell'Excel (5 fogli)
 
 1. *Leggimi* — istruzioni, ipotesi di calcolo, fonti, riconciliazione cedolino, disclaimer.
@@ -79,7 +89,7 @@ override IRPEF lorda 4.810,85, residui 345,82/64,12, acconto 36,43, arrotondamen
 - `build_payslip.py` — genera l'xlsx e inietta i dati MEF nell'HTML (tra i marcatori `/*__COMUNI_DATA_START__*/` e `/*__COMUNI_DATA_END__*/`). Single source of truth delle formule Excel.
 - `gen_addizionali.py` — rigenera `data/*.csv` dagli elenchi MEF (sorgenti e formato nel docstring).
 - `addizionale_lib.py` — regole addizionali MEF (condiviso con il progetto gemello dipendente).
-- `test_simulatore.py` — protocollo di verifica obbligatorio: replica Python vs motore `formulas` (confronti cella per cella, tolleranza 0,01 €), scan errori, 14 casi soglia, **verifiche assolute su ENTRAMBI i cedolini reali (ced.01 e ced.03)**; stampa i benchmark aggiornati. Richiede `pip install formulas openpyxl`.
+- `test_simulatore.py` — protocollo di verifica obbligatorio: replica Python vs motore `formulas` (confronti cella per cella, tolleranza 0,01 €), scan errori, 14 casi soglia, **verifiche assolute su TRE benchmark reali (ced.01, ced.03 ed elaborazione di controllo 2027)**; stampa i benchmark aggiornati. Richiede `pip install formulas openpyxl`.
 - `test_html.js` — suite jsdom per l'HTML (richiede `npm i jsdom` in `/tmp`).
 - `data/addizionali_comuni_2026.csv` (7.897 comuni) e `data/addizionali_regionali_2026.csv` (21 enti).
 - Dettagli operativi e insidie note: leggere **AGENTS.md** prima di qualsiasi modifica.
@@ -88,13 +98,13 @@ Comandi:
 
 ```bash
 python3 build_payslip.py      # genera xlsx + inietta dati MEF nell'HTML
-python3 test_simulatore.py    # replica Python vs motore Excel + verifiche cedolini reali
+python3 test_simulatore.py    # replica Python vs motore Excel + verifiche benchmark reali
 node test_html.js             # suite jsdom sull'HTML
 ```
 
 ## Verifica operativa
 
-`python3 test_simulatore.py` → **TUTTI I TEST PASSATI** (15 casi, 480 confronti cella per cella, 12 soglie addizionali, 38 verifiche cedolini reali: 20 sul cedolino 01 + 18 sul cedolino 03; i casi includono superminimo ad personam a 1.000/1.500/2.500 €/mese).
+`python3 test_simulatore.py` → **TUTTI I TEST PASSATI** (15 casi, 480 confronti cella per cella, 12 soglie addizionali, 59 verifiche benchmark reali: 20 ced.01 + 18 ced.03 + 21 elaborazione controllo 2027 netto 44.000; i casi includono superminimo ad personam a 1.000/1.500/2.500 €/mese).
 `node test_html.js` → **TUTTI I TEST HTML PASSATI** (preset cedolino 01, scenario cedolino 03, mese pulito, 26 gg, Lombardia/Milano, anno 2027, sanity NaN, accessibilità label).
 
 Benchmark (2026 Lazio/Roma, GG 25+1+1, fringe 136,40): preset cedolino netto **4.184,00**; senza conguagli netto 4.378,66 (IRPEF 2.557,41 = annua/14, addizionali rateizzate /12); mese pieno 26 gg netto 4.158,89, netto annuo 59.233,39; default RAL 111.780 → netto annuo 58.460,33 (4.175,74/mese); 2027: 60.185,43; 2028: 61.645,12.

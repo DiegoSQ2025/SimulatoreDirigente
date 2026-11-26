@@ -26,7 +26,7 @@ Calcolatore **dalla RAL al NETTO** per **dirigenti del CCNL Terziario, Distribuz
 | `Simulatore_Dirigente_CCNL_Commercio.xlsx` | Foglio di calcolo (5 fogli), formule Excel native | Generato da `build_payslip.py` — **mai modificato a mano** |
 | `simulatore_dirigente.html` | Simulatore browser autonomo (vanilla JS, ~1 MB con dati MEF iniettati: 7.897 comuni) | Nessuna dipendenza runtime, funziona offline |
 | `build_payslip.py` | **Generatore = single source of truth** delle formule Excel + iniezione dati MEF nell'HTML | Idempotente, scrittura atomica |
-| `test_simulatore.py` | Suite Python: py_calc vs motore `formulas` + verifiche cedolini reali | 15 casi, 480 confronti, 12 soglie, 38 verifiche cedolini reali |
+| `test_simulatore.py` | Suite Python: py_calc vs motore `formulas` + verifiche benchmark reali | 15 casi, 480 confronti, 12 soglie, 59 verifiche benchmark reali |
 | `test_html.js` | Suite jsdom sull'HTML (77 controlli) | Richiede jsdom in `/tmp/node_modules` |
 | `addizionale_lib.py`, `gen_addizionali.py`, `data/*.csv` | Regole e dati MEF addizionali (21 enti regionali, 7.897 comuni) | Copie verbatim dal progetto gemello |
 | `README.md` | Manuale utente + benchmark | |
@@ -117,8 +117,9 @@ TFR (art. 43: devoluzione a fondi o liquidazione a tassazione separata), trattam
 | Fringe 100/mese × 12 (caso permanente) | invariato | invariato | — | 4.117,80 (vs 4.158,89 senza fringe) | invariata 111.780,00 | 58.666,63 (vs 59.233,39) | +566,76 tasse/anno, vantaggio economico 633,24/anno |
 
 **Repliche esatte dei cedolini** (nelle suite, con giorni reali e override):
-- **ced.01** (27 GG pagate 25+1+1, override conguaglio): competenze 8.291,38 → trattenute 4.107,91 → **netto 4.184,00** ✓ (38 verifiche cedolini reali totali).
+- **ced.01** (27 GG pagate 25+1+1, override conguaglio): competenze 8.291,38 → trattenute 4.107,91 → **netto 4.184,00** ✓ (20 verifiche).
 - **ced.03** (26 GG + 1 festività, override): competenze 13.612,95 → trattenute 6.817,53 → **netto 6.796,00** ✓ (18 verifiche).
+- **elab. controllo gennaio 2027** (visuale annua, superminimo 550,11117 per netto target 44.000): RAL 76.581,55 ✓, IVS 7.037,89 su base annua arrotondata ✓, agg 203,58 ✓, Negri 1.184,49 ✓, IRPEF lorda 21.502,25 = scaglioni 23/33/43 sul suo imponibile 68.144,76 ✓, add.reg. Lazio marg **2.029,22** ✓ e add.com. Roma **613,30** ✓ AL CENTESIMO (terza validazione indipendente), TFR quota 5.672,71 = retrib. utile/13,5 ✓ (21 verifiche). Struttura ridotta dell'allegato: senza FASDAC (859,08), senza Pastore (464,81), senza detrazione art. 13 (522,91), formazione non annualizzata → suo netto 44.000 vs nostro 43.074,79 con gli stessi input, spiegato al centesimo; con il modello completo servono 713,16/mese di superminimo per netto 44.000.
 - Aliquota marginale verificata: +500/mese di superminimo → +3.317,49/anno netto = **52,61% marginale** (0,1019 contributi + 0,8981 × 0,4723 fisco, esatto).
 
 ---
@@ -132,7 +133,7 @@ build_payslip.py  (single source of truth)
 
 Verifica a triangolazione (obbligatoria prima di ogni push):
    py_calc (test_simulatore.py)  ↔  motore `formulas` sull'xlsx  ↔  jsdom sull'HTML
-   + verifiche assolute al centesimo sui DUE cedolini reali
+   + verifiche assolute al centesimo sui TRE benchmark reali
 ```
 
 Regola d'oro: **modificare il generatore, mai l'xlsx a mano**; riferimenti alle celle sempre via ricerca-etichetta (mai righe hardcoded).
@@ -153,6 +154,7 @@ Regola d'oro: **modificare il generatore, mai l'xlsx a mano**; riferimenti alle 
 10. **Sezione giorni rimossa** (commit `ae8edcb`): mese fisso 26 GG pieni nel HTML; giorni reali solo in Excel/py_calc per la replica dei cedolini.
 11. **KPI in alto = netto annuale ÷ 14** (commit `ae8edcb`): vista simulatore RAL→NETTO; il "NETTO DEL MESE" nella tabella resta la vista payslip (addizionali ÷12).
 12. **Bug reale trovato e corretto (verifica utente sui fondi)**: la trattenuta IRPEF mensile era la LORDA mentre KPI e prospetto annuo usano la NETTA: con detrazione art. 13 attiva il netto mensile non riconciliava col netto annuale/14 (75,10 €/mese fantasma nel caso 2027 Lazio/Roma). Ora tutti e tre i motori trattenanno la NETTA (lorda/14 − detrazione/14), con righe separate lorda/detrazione/netta e riga-ponte esplicita mese tipo ↔ media annuale (fondi/addizionali su 12 rate). Le repliche dei cedolini reali restano identiche (nei cedolini campione detrazione = 0, RLD > 75.000). Verifica fondi riconfermata al centesimo: Negri 59.224,54/12 × 2% = 98,71, FASDAC 45.940/12 × 1,87% = 71,59, Pastore 464,81/12 = 38,73.
+13. **Terzo benchmark (elaborazione di controllo gennaio 2027, netto target 44.000)**: nessun errore nel nostro modello — l'elaborazione esterna conferma al centesimo IVS, agg. 1%, Negri, scaglioni 23/33/43, addizionali Lazio/Roma, 14 mensilità e TFR/13,5. Le differenze sul netto (44.000 vs 43.074,79) sono omissioni della struttura ridotta dell'allegato: senza FASDAC, senza Pastore, senza detrazione art. 13, formazione non annualizzata. Con il modello completo il superminimo per netto 44.000 è 713,16 €/mese.
 
 ---
 
@@ -178,7 +180,7 @@ Ristrutturazione a **vista annuale RAL come principale** + dettaglio mensile opz
 ## 9. Per gli agenti AI che riprenderanno il progetto
 
 1. **Leggere prima AGENTS.md**: contiene il protocollo di verifica obbligatorio, le insidie tecniche (bug già risolti — non reintrodurli) e le convenzioni di stile.
-2. **Prima di ogni push**: `python3 test_simulatore.py` ("TUTTI I TEST PASSATI — 15 casi, 480 confronti, 12 soglie, 38 verifiche cedolini reali") + `node test_html.js` ("TUTTI I TEST HTML PASSATI" — 77 controlli). Jsdom si trova in `/tmp/node_modules` (reinstallare se la sandbox è stata resettata: `npm i --prefix /tmp jsdom`).
+2. **Prima di ogni push**: `python3 test_simulatore.py` ("TUTTI I TEST PASSATI — 15 casi, 480 confronti, 12 soglie, 59 verifiche benchmark reali") + `node test_html.js` ("TUTTI I TEST HTML PASSATI" — 77 controlli). Jsdom si trova in `/tmp/node_modules` (reinstallare se la sandbox è stata resettata: `npm i --prefix /tmp jsdom`).
 3. **Rebuild Excel** dopo ogni modifica al generatore: `python3 build_payslip.py` (idempotente — `git diff` vuoto sull'HTML dopo il rebuild se non è stato toccato).
 4. **Repo gemello `DiegoSQ2025/SimulatoreCedolino`** (versione dipendente): **READ-ONLY, non toccare mai nulla** — directive esplicita dell'utente. Condivide `addizionale_lib.py`/`gen_addizionali.py`/`data/*.csv` ma le regole dirigente sono diverse: non copiare formule tra i due progetti.
 5. **Push su `main`**: `git -c credential.helper='!gh auth git-credential' push` (main non protetto; commit sintetici in italiano).
@@ -201,3 +203,4 @@ Ristrutturazione a **vista annuale RAL come principale** + dettaglio mensile opz
 | `ae8edcb` | **Mese fisso 26 GG pieni** (sezione giorni rimossa), KPI = netto annuale ÷ 14, override a zero |
 | corrente | SUP.CONTR = superminimo da contratto; HTML: unica variabile "Superminimo ad personam", importi variabili a ZERO, etichette "Fringe benefit" e "Indennità denaro" |
 | `fondo-verifica` | **IRPEF netta in busta** (lorda − detrazione art. 13, tutte e tre le implementazioni), riga-ponte mese tipo ↔ media annuale, credito welfare 2026–2028 documentato (1.500 €/anno); suite: 15 casi, 480 confronti, 38 verifiche cedolini reali + 77 controlli HTML |
+| `sim27` | Terzo benchmark: elaborazione di controllo gennaio 2027 (netto target 44.000) replicata — regole condivise confermate al centesimo; differenze spiegate (FASDAC/Pastore/detrazione omesse dall'allegato); suite: 59 verifiche benchmark reali |
