@@ -59,11 +59,12 @@ RME = MINIMO + SUP.CONTR + SMM 2016 + S.MINIMO + scatti pre-2004
 | Voce | Natura | Default (ced.01) |
 |---|---|---|
 | MINIMO (art. 5) | tabellare CCNL, dal menu anno: 4.660 (2026) / 4.920 (2027) / 5.140 (2028) | 4.660,00 |
-| **SUP.CONTR** | **minimo CONTRATTUALE integrativo** — voce di contratto, uguale per tutti; **NON è un superminimo** (terminologia corretta su richiesta utente) | 1.317,48 |
+| **SUP.CONTR** | **superminimo da contratto** — quota fissa che supera il minimo tabellare, concordata individualmente nella lettera di assunzione per raggiungere la RAL pattuita (definizione utente) | 1.317,48 |
 | SMM 2016 | aumento nazionale transitorio 2016, fisso per tutti | 350,00 |
-| **S.MINIMO** | **superminimo INDIVIDUALE** — l'unica voce di superminimo, variabile personale (variabile a inserimento manuale) | 1.656,80572 |
+| **S.MINIMO** | **superminimo individuale** — negoziato col singolo dirigente | 1.656,80572 |
 | scatti pre-2004 | solo dirigenti assunti prima del 1/7/2004 (+258,22/mese) | 0 |
 
+- **Nell'HTML SUP.CONTR e S.MINIMO sono UNITE in un'unica variabile "Superminimo ad personam"** (default 0: tutti gli importi variabili partono da zero, li inserisce l'utente; per replicare ced.01 inserire 2.974,28572, per ced.03 7.847,14). In Excel/py restano due voci distinte.
 - **Giornaliera** = RME ÷ 26 (art. 4 c.6 TU) — ced.01: 307,08791.
 - **RAL** = RME × **14 mensilità** (art. 8: 13ª dicembre, 14ª giugno). Presentata SEMPRE in due righe distinte (richiesta utente): *base di contratto* (minimo+SUP.CONTR+SMM)×14 e *superminimo individuale*×14.
 - **Ced.03 (secondo dirigente)**: senza SUP.CONTR; intestazione = 4.660 + AUM.RETR. 500 + SMM 350 + S.MINIMO 6.489,99714 + Ad Pers. 857,14286 = RME 12.857,14. Nel simulatore: supc=0, supi=7.847,14.
@@ -108,7 +109,7 @@ TFR (art. 43: devoluzione a fondi o liquidazione a tassazione separata), trattam
 
 | Caso | Competenze | IVS 9,19% | Trattenute | **Netto mese** | RAL | **Netto annuo** | Netto/14 |
 |---|---|---|---|---|---|---|---|
-| **Default HTML** (retr. ced.01, fringe 136,40, Lazio/Roma 2026) | 7.984,29 | 733,73 | 3.881,44 | 4.102,85 (payslip) | 111.780,00 | **58.460,33** | **4.175,74** |
+| **Default HTML** (TUTTO a zero: solo minimo 4.660, Lazio/Roma 2026; detrazione art. 13 attiva 1.301,11) | 4.660,00 | 428,25 | 2.055,82 | 2.604,18 (payslip) | 65.240,00 | **38.477,92** | **2.748,42** |
 | Stile ced.03 (supi 7.847,14 + indennità 261,30) | 13.118,44 | 1.205,54 | 6.755,03 | 6.363,41 | 179.999,96 | **93.186,70** | 6.656,19 |
 | Anno 2027 (minimo 4.920) | 8.244,29 | 757,62 | 4.019,86 | 4.224,43 | 115.420,00 | 60.185,43 | 4.298,96 |
 | Lombardia/Milano 2026 | 7.984,29 | 733,73 | 3.749,72 | 4.234,57 | 111.780,00 | 60.040,90 | 4.288,64 |
@@ -141,7 +142,7 @@ Regola d'oro: **modificare il generatore, mai l'xlsx a mano**; riferimenti alle 
 ## 7. Decisioni prese (traccia delle richieste utente)
 
 1. **14 mensilità** per i dirigenti commercio (art. 8 TU) — IRPEF ÷14, addizionali ÷12.
-2. **SUP.CONTR ≠ superminimo**: è un *minimo contrattuale integrativo*; l'unico superminimo è S.MINIMO (rinominato ovunque, commit `2506756`).
+2. **SUP.CONTR = superminimo da contratto** (definizione utente finale): quota fissa oltre il minimo concordata nella lettera di assunzione; prima era stato etichettato "minimo contrattuale integrativo" (commit `2506756`), poi unificato con S.MINIMO nell'unica variabile HTML "Superminimo ad personam" con importi a zero (commit corrente).
 3. **RAL in due righe**: base di contratto CCNL e superminimo personale separate, mai sommarle in una voce (commit `38779d5`).
 4. **Superminimo, fringe e indennità = variabili a inserimento manuale** con calcoli completi (IVS/IRPEF/TFR come da regole §4.4).
 5. **Menu a tendina anno + minimo lordo** (4.660/4.920/5.140, commit `2506756`).
@@ -180,7 +181,7 @@ Ristrutturazione a **vista annuale RAL come principale** + dettaglio mensile opz
 3. **Rebuild Excel** dopo ogni modifica al generatore: `python3 build_payslip.py` (idempotente — `git diff` vuoto sull'HTML dopo il rebuild se non è stato toccato).
 4. **Repo gemello `DiegoSQ2025/SimulatoreCedolino`** (versione dipendente): **READ-ONLY, non toccare mai nulla** — directive esplicita dell'utente. Condivide `addizionale_lib.py`/`gen_addizionali.py`/`data/*.csv` ma le regole dirigente sono diverse: non copiare formule tra i due progetti.
 5. **Push su `main`**: `git -c credential.helper='!gh auth git-credential' push` (main non protetto; commit sintetici in italiano).
-6. **Terminologia vincolante** (richieste esplicite dell'utente, non modificare): SUP.CONTR = "minimo contrattuale" (NON superminimo); S.MINIMO = unico superminimo, "personale"; indennità auto = "indennità personale in denaro" (NON fringe benefit); mese = 26 GG fissi nella pagina HTML; KPI in alto = netto annuale ÷ 14.
+6. **Terminologia vincolante** (richieste esplicite dell'utente, non modificare): SUP.CONTR = "superminimo da contratto"; HTML = unica variabile "Superminimo ad personam — SUP.CONTR + S.MINIMO"; etichette corte "Fringe benefit" e "Indennità denaro"; TUTTI gli importi variabili a zero all'avvio (li inserisce l'utente); mese = 26 GG fissi nella pagina HTML; KPI in alto = netto annuale ÷ 14.
 
 ---
 
@@ -197,3 +198,4 @@ Ristrutturazione a **vista annuale RAL come principale** + dettaglio mensile opz
 | `992c548` | Caso fringe 100/mese × 12 permanente (suite: 15 casi, 450 confronti) |
 | `71fe93c` | Fix layout mobile: etichette compatte + `.help`, colonne impilate <640px |
 | `ae8edcb` | **Mese fisso 26 GG pieni** (sezione giorni rimossa), KPI = netto annuale ÷ 14, override a zero |
+| corrente | SUP.CONTR = superminimo da contratto; HTML: unica variabile "Superminimo ad personam", importi variabili a ZERO, etichette "Fringe benefit" e "Indennità denaro" |

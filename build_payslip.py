@@ -123,16 +123,16 @@ lines = [
     ("1. Foglio 'Parametri': TUTTE le variabili (IVS, fondi Negri/FASDAC/Pastore, IRPEF, minimi CCNL 2026-2028).", None),
     ("2. Scegli REGIONE e COMUNE (menu a discesa, dati MEF 2026): addizionali calcolate in automatico.", None),
     ("3. Foglio 'Simulazione': retribuzione in 4 voci, giorni del mese, prospetto annuo e 'cedolino del mese'.", None),
-    ("   N.B. SUP.CONTR = minimo CONTRATTUALE integrativo (voce di contratto, si somma al MINIMO art. 5;", None),
-    ("   uguale per tutti i dirigenti; nel cedolino 03 e' ABSENTE: se l'azienda ti mostra AUM.RETR. o Ad Pers.,", None),
-    ("   poni SUP.CONTR a 0 e sommal QUI: sono componenti personali. S.MINIMO = superminimo INDIVIDUALE", None),
-    ("   negoziato col singolo dirigente: e' la variabile personale (cella gialla, anche a 0).", None),
+    ("   N.B. SUP.CONTR = SUPERMINIMO DA CONTRATTO: quota di retribuzione fissa che supera il minimo", None),
+    ("   tabellare, concordata individualmente nella lettera di assunzione per raggiungere la RAL pattuita;", None),
+    ("   nel cedolino 03 e' ABSENTE: se l'azienda ti mostra AUM.RETR. o Ad Pers., poni SUP.CONTR a 0 e", None),
+    ("   sommal QUI. S.MINIMO = superminimo INDIVIDUALE negoziato col singolo dirigente (cella gialla, anche 0).", None),
     ("   RAL di fatto = RAL base di contratto (minimo + SUP.CONTR + SMM 2016) x 14 + S.MINIMO x 14 (+ scatti).", None),
     ("4. Foglio 'Confronto anni': minimi CCNL 2026/2027/2028 con gli stessi parametri.", None),
     ("", None),
     ("REGOLE DIRIGENTE (TU CCNL Dirigenti + cedolino Zucchetti di riferimento)", "h"),
-    ("- Retribuzione mensile in 4 voci: MINIMO CCNL (4.660,00 dal 1/1/2026), minimo contrattuale", None),
-    ("  (SUP.CONTR), SMM 2016 (350,00) e superminimo individuale (S.MINIMO): 4.660+1.317,48+350+1.656,81 = 7.984,29.", None),
+    ("- Retribuzione mensile in 4 voci: MINIMO CCNL tabellare (4.660,00 dal 1/1/2026), superminimo da", None),
+    ("  contratto (SUP.CONTR), SMM 2016 (350,00) e superminimo individuale (S.MINIMO): 4.660+1.317,48+350+1.656,81 = 7.984,29.", None),
     ("- 26 son le GIORNATE STANDARD del mese dirigente (art. 4 c. 6 TU): retribuzione giornaliera = mensile/26;", None),
     ("  nel cedolino 7.984,29/26 = 307,08791 \u20ac. Ferie e festivita' sostituiscono le giornate una a una.", None),
     ("- 14 mensilita' (art. 8 TU): 13\u00aa a dicembre, 14\u00aa a giugno, retribuzione di fatto.", None),
@@ -156,10 +156,10 @@ lines = [
     ("- Fondo formazione Mario Negri: 10,83 \u20ac/mese dirigente + 24,17 azienda (valori cedolino; il rinnovo 2026", None),
     ("  potrebbe averli aggiornati: verifica il fondo).", None),
     ("- TFR: art. 2120 c.c. con devoluzione ai fondi (art. 43 TU). NON e' trattenuta: non riduce il netto.", None),
-    ("- FRINGE BENEFIT (art. 51 TUIR) vs INDENNITA' PERSONALE IN DENARO: due voci distinte e diverse.", None),
+    ("- FRINGE BENEFIT (art. 51 TUIR) vs INDENNITA' DENARO: due voci distinte e diverse.", None),
     ("  Fringe in natura (es. 136,40 del ced.01): beneficio in specie, tassabile SOLO a IRPEF: non e'", None),
-    ("  incassato, fuori dalle competenze e dalla base IVS (dentro pero' la base TFR). Indennita'", None),
-    ("  personale in denaro (es. autovettura 261,30 del ced.03, voce Z.000463): NON e' un fringe benefit", None),
+    ("  incassato, fuori dalle competenze e dalla base IVS (dentro pero' la base TFR). Indennita' denaro", None),
+    ("  (es. autovettura 261,30 del ced.03, voce Z.000463): NON e' un fringe benefit", None),
     ("  bensi' un emolumento/compensazione monetaria (spesso opt-out dell'auto aziendale): entra in", None),
     ("  competenze, base IVS, IRPEF e base TFR come lo stipendio.", None),
     ("- ADDIZIONALI: menu REGIONE (21 enti MEF) e COMUNE (7.897 comuni, dati 2026); modellate aliquote uniche e", None),
@@ -429,7 +429,7 @@ dv_anno = DataValidation(type="list", formula1='"2026,2027,2028"', allow_blank=F
 ws.add_data_validation(dv_anno); dv_anno.add(ws.cell(row=cell_anno, column=2))
 r = put(ws, r, "MINIMO CCNL mensile", f"=IFERROR(VLOOKUP(TEXT($B${cell_anno},\"0\"),{P['TBL']},2,0),VLOOKUP($B${cell_anno},{P['TBL']},2,0))", "dal foglio Parametri", MONEY)
 c_minimo = r - 1
-r = put(ws, r, "SUP.CONTR \u2014 minimo CONTRATTUALE integrativo (mensile)", 1317.48, "voce di contratto che si somma al MINIMO art. 5 (cedolino 1.317,48); nel cedolino 03 ASSENTE: se l'azienda mostra AUM.RETR./Ad Pers., metti 0 e sommali a S.MINIMO", MONEY, True)
+r = put(ws, r, "SUP.CONTR \u2014 superminimo da contratto (mensile)", 1317.48, "quota fissa che supera il minimo tabellare, concordata nella lettera di assunzione per raggiungere la RAL (cedolino 1.317,48); nel cedolino 03 ASSENTE: se l'azienda mostra AUM.RETR./Ad Pers., metti 0 e sommali a S.MINIMO", MONEY, True)
 c_supc = r - 1
 r = put(ws, r, "SMM 2016 (mensile)", 350.0, "elemento contrattuale transitorio 2016 (cedolino 350)", MONEY, True)
 c_smm = r - 1
@@ -450,9 +450,9 @@ r = put(ws, r, "Giorni di ferie godute", 1, "Z00250", None, True)
 c_ggfer = r - 1
 r = put(ws, r, "Giorni festivita'/permessi", 1, "Z01138", None, True)
 c_ggfest = r - 1
-r = put(ws, r, "Fringe benefit mensile (in natura, tassabile)", 136.4, "voce in natura: tassabile, non e' flusso di cassa", MONEY, True)
+r = put(ws, r, "Fringe benefit (mensile)", 136.4, "voce in natura: tassabile, non e' flusso di cassa", MONEY, True)
 c_fringe = r - 1
-r = put(ws, r, "Indennita' personale in denaro (mensile, es. autovettura)", 0.0, "emolumento in DENARO, NON fringe ben. art. 51: come Z.000463 ced.03 (261,30) = compensazione monetaria/opt-out auto; entra in competenze, IVS, IRPEF e base TFR", MONEY, True)
+r = put(ws, r, "Indennita' denaro (mensile)", 0.0, "emolumento in DENARO, NON fringe ben. art. 51: come Z.000463 ced.03 (261,30) = compensazione monetaria/opt-out auto; entra in competenze, IVS, IRPEF e base TFR", MONEY, True)
 c_fringeCash = r - 1
 
 r += 1
@@ -483,7 +483,7 @@ r = put(ws, r, "Ferie godute (gg x retr. giornaliera)", f"=ROUND($B${c_ggfer}*$B
 c_fer = r - 1
 r = put(ws, r, "Festivita'/permessi (gg x retr. giornaliera)", f"=ROUND($B${c_ggfest}*$B${c_giorn},2)", "Z01138", MONEY)
 c_fest = r - 1
-r = put(ws, r, "Indennita' personale in denaro (es. autovettura)", f"=$B${c_fringeCash}", "ced.03: 261,30 in cassa (Z.000463): retribuzione piena, non fringe ben.", MONEY)
+r = put(ws, r, "Indennita' denaro", f"=$B${c_fringeCash}", "ced.03: 261,30 in cassa (Z.000463): retribuzione piena, non fringe ben.", MONEY)
 c_frcc = r - 1
 r = put(ws, r, "TOTALE COMPETENZE", f"=B{c_ret}+B{c_fer}+B{c_fest}+B{c_fringeCash}", "cedolino 8.291,38; cedolino 03: 13.612,95", MONEY, False, True)
 c_comp = r - 1
@@ -515,7 +515,7 @@ r = put(ws, r, "TOTALE TRATTENUTE", f"=B{c_ivsm}+B{c_aggm}+B{c_negrim}+B{c_fasda
 c_tratt = r - 1
 r = put(ws, r, "NETTO DEL MESE", f"=B{c_comp}-B{c_tratt}+B{c_arrotN}", "cedolino: 4.184,00 (8.291,38 \u2212 4.107,91 + 0,53)", MONEY, False, True)
 c_nettoM = r - 1
-r = put(ws, r, "(Fringe benefit del mese: in natura, non in cassa)", f"=$B${c_fringe}", "informativo: tassabile, non tocca il netto", MONEY)
+r = put(ws, r, "Fringe benefit", f"=$B${c_fringe}", "informativo: tassabile, non tocca il netto", MONEY)
 
 r += 1
 r = section(ws, r, "CALCOLO ANNUO (modello a scaglioni \u2014 base IRPEF del gestionale non ricostruita)", 3)

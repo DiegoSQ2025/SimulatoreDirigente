@@ -21,12 +21,13 @@ Tool di simulazione **dal lordo al netto** per **dirigenti del CCNL Terziario, D
 | IRPEF 2026 | scaglioni 23% / 33% / 43% (L. 199/2025); detrazione art. 13 sul RLD (0 oltre 75.000 €); **IRPEF del mese = IRPEF annua ÷ 14** | — |
 | Addizionali | elenchi generali MEF 2026: 21 enti regionali + 7.897 comuni; **rate mensile = annua ÷ 12** | Lazio 1,73/3,33% ; Roma 0,9% ≤14.000 |
 
-**SUP.CONTR vs S.MINIMO — differenza chiave**
+**I due superminimi (definizione utente)**
 
-- **SUP.CONTR (minimo contrattuale integrativo)**: voce *di contratto*, si somma al MINIMO art. 5 ed è uguale per tutti i dirigenti (parte tabellare del TU/allegato C) — 1.317,48 €/mese nel cedolino 01. **Nel cedolino 03 è assente**: se la tua azienda mostra voci tipo "AUM.RETR." o "Ad Pers.", poni SUP.CONTR a 0 e sommale al campo S.MINIMO (sono componenti individuali). **NON è un superminimo**: l'unico superminimo è l'S.MINIMO.
-- **S.MINIMO (superminimo individuale)**: il superminimo *personale* negoziato tra azienda e singolo dirigente → **la variabile da inserire manualmente** (1.656,81 €/mese nel cedolino 01; 7.847,14 €/mese nel cedolino 03 = AUM.RETR. 500 + S.MINIMO 6.489,99714 + Ad Pers. 857,14286; può essere 0).
+- **SUP.CONTR (superminimo da contratto)**: quota di retribuzione fissa che supera il minimo tabellare, concordata individualmente nella lettera di assunzione (o in successivi accordi) per raggiungere la RAL pattuita — 1.317,48 €/mese nel cedolino 01. **Nel cedolino 03 è assente**: se la tua azienda mostra voci tipo "AUM.RETR." o "Ad Pers.", poni SUP.CONTR a 0 e sommale al campo S.MINIMO (sono componenti individuali).
+- **S.MINIMO (superminimo individuale)**: il superminimo *personale* negoziato tra azienda e singolo dirigente (1.656,81 €/mese nel cedolino 01; può essere 0).
+- **Nel simulatore HTML le due voci sono UNITE nella singola variabile "Superminimo ad personam — SUP.CONTR + S.MINIMO"** (ced.01: 1.317,48 + 1.656,81 = 2.974,29); in Excel e nei test restano distinte. **All'avvio tutti gli importi variabili sono a zero**: li inserisci tu.
 
-La pagina mostra ora entrambe le RAL separatamente: **RAL base di contratto** = (minimo + SUP.CONTR + SMM 2016) × 14 (88.584,72 € nel cedolino 01; 70.140,00 € nel cedolino 03) e **superminimo individuale** × 14 (23.195,28 € ced.01; 109.859,96 € ced.03) → RAL di fatto 111.780,00 € (ced.01) e 179.999,96 € (ced.03). Le giornate standard del mese dirigente sono **26** (art. 4 c.6 TU: ogni giornata vale RME ÷ 26; ferie e festività le sostituiscono una a una). Nel simulatore HTML il mese è sempre pieno a 26 GG — sezione giorni rimossa su richiesta: le simulazioni partono da **RAL + benefit + indennità** come un vero ufficio paghe; la replica puntuale dei cedolini reali (ferie, festività, conguagli) resta nel foglio Excel e nelle suite di test. Il KPI in alto mostra il **netto mensile medio = netto annuale ÷ 14**; la tabella mensile mostra la vista payslip (IRPEF ÷14, addizionali ÷12).
+La pagina mostra le RAL in righe separate: **RAL base di contratto** = (minimo tabellare + SMM 2016) × 14 (65.240,00 € con solo il minimo 2026) e **superminimo ad personam** × 14 (ced.01: 41.640,00 € = 2.974,29 × 14; ced.03: 109.859,96 €) → RAL di fatto 111.780,00 € (ced.01) e 179.999,96 € (ced.03). Le giornate standard del mese dirigente sono **26** (art. 4 c.6 TU: ogni giornata vale RME ÷ 26; ferie e festività le sostituiscono una a una). Nel simulatore HTML il mese è sempre pieno a 26 GG — sezione giorni rimossa su richiesta: le simulazioni partono da **RAL + benefit + indennità** come un vero ufficio paghe; la replica puntuale dei cedolini reali (ferie, festività, conguagli) resta nel foglio Excel e nelle suite di test. Il KPI in alto mostra il **netto mensile medio = netto annuale ÷ 14**; la tabella mensile mostra la vista payslip (IRPEF ÷14, addizionali ÷12).
 
 **Fringe benefit (art. 51 TUIR) e indennità personale in denaro: due voci concettualmente diverse**, entrambe variabili manuali:
 
@@ -62,7 +63,7 @@ Il modello si replica **al centesimo** anche sul cedolino di un secondo dirigent
   add.reg. 345,82 + add.com. 64,12 + acconto 36,43 + arrotond. 0,14 = **TOTALE TRATTENUTE 6.817,53**;
 - **NETTO 6.796,00** = 13.612,95 − 6.817,53 + 0,58 ✓; RAL 179.999,96 (base contratto 70.140,00 + superminimo individuale 109.859,96).
 
-Nel simulatore: supc=0, supi=7847.14, ggRet=26, ggFer=0, ggFest=1, fringe in natura 0, indennità in denaro 261,30,
+Nel simulatore HTML: superminimo ad personam = 7.847,14 (AUM.RETR. + S.MINIMO + Ad Pers.), SMM 350, indennità denaro 261,30 (in Excel/py: supc=0, supi=7847.14),
 override IRPEF lorda 4.810,85, residui 345,82/64,12, acconto 36,43, arrotondamenti 0,14/0,58.
 
 ## Struttura dell'Excel (5 fogli)

@@ -69,9 +69,9 @@
  <p>CCNL Dirigenti Terziario, Distribuzione e Servizi (Confcommercio–Manageritalia, TU 12/4/2023):
     14 mensilità (art. 8), retribuzione giornaliera = mensile/26 (art. 4), fondi Mario Negri · FASDAC · A. Pastore.
     Addizionali regionali e comunali da elenchi MEF 2026 (21 enti, 7.897 comuni).
-    Mese standard: 26 giornate retribuite (art. 4 c.6 TU). Preset di default: la retribuzione del cedolino
-    Zucchetti di riferimento (livello 5, Lazio/Roma); la replica puntuale dei cedolini reali (ferie, festività,
-    conguagli) resta nel foglio Excel e nelle suite di test.</p>
+    Mese standard: 26 giornate retribuite (art. 4 c.6 TU). Al via trovi solo il minimo tabellare art. 5:
+    superminimo ad personam, SMM 2016, fringe benefit e indennità denaro partono da zero e li inserisci tu
+    (la replica puntuale dei cedolini reali resta nel foglio Excel e nelle suite di test).</p>
 </header>
 
 <div class="wrap">
@@ -86,20 +86,18 @@
   <div class="card inputs">
    <h2>Parametri di partenza</h2>
    <div class="sezione">Il salario fisso <span class="sub">quello che entra ogni mese, prima di tasse e trattenute</span></div>
-   <label for="anno">Anno + minimo mensile lordo (art. 5) <span class="help">CCNL: 4.660 (2026) · 4.920 (2027) · 5.140 (2028); era 4.340 dal 1/7/2025</span></label>
-   <select id="anno"><option selected value="2026">2026 — lordo mensile 4.660,00 € (dal 1°/1/2026)</option><option value="2027">2027 — lordo mensile 4.920,00 € (dal 1°/1/2027)</option><option value="2028">2028 — lordo mensile 5.140,00 € (dal 1°/1/2028)</option></select>
+   <label for="anno">Anno + minimo tabellare (art. 5) <span class="help">CCNL: 4.660 (2026) · 4.920 (2027) · 5.140 (2028); il superminimo si inserisce a parte</span></label>
+   <select id="anno"><option selected value="2026">2026 — tabellare 4.660,00 € (dal 1°/1/2026)</option><option value="2027">2027 — tabellare 4.920,00 € (dal 1°/1/2027)</option><option value="2028">2028 — tabellare 5.140,00 € (dal 1°/1/2028)</option></select>
    <div class="row2">
-    <div><label for="supc">Minimo contrattuale — SUP.CONTR (€/mese) <span class="help">voce di contratto, uguale per tutti: NON è un superminimo (quello è solo l'S.MINIMO)</span></label><input type="number" id="supc" value="1317.48"></div>
-    <div><label for="smm">Bonus SMM 2016 (€/mese) <span class="help">aumento nazionale del 2016, fisso per tutti</span></label><input type="number" id="smm" value="350"></div>
-   </div>
-   <div class="row2">
-    <div><label for="supi">Superminimo personale — S.MINIMO (€/mese) <span class="help">la TUA variabile, negoziata con l’azienda: copiala dal cedolino</span></label><input type="number" id="supi" value="1656.80572"></div>
+    <div><label for="smm">Bonus SMM 2016 (€/mese) <span class="help">aumento nazionale del 2016, fisso per tutti</span></label><input type="number" id="smm" value="0"></div>
     <div><label for="scatti">Anzianità pre-2004 (€/mese) <span class="help">solo per dirigenti assunti prima del luglio 2004</span></label><input type="number" id="scatti" value="0" min="0"></div>
    </div>
+   <label for="supi">Superminimo ad personam — SUP.CONTR + S.MINIMO (€/mese) <span class="help">quota fissa oltre il minimo: da contratto (lettera di assunzione) + individuale; ced.01: 1.317,48 + 1.656,81</span></label>
+   <input type="number" id="supi" value="0">
    <div class="sezione">Benefit e indennità <span class="sub">da inserire a mano: sono i vantaggi che non figgono tra le voci fisse</span></div>
    <div class="row2">
-    <div><label for="fringe">Fringe benefit in natura (€/mese) <span class="help">vantaggio ricevuto, non denaro (es. auto aziendale): tasse sì, cassa e IVS no</span></label><input type="number" id="fringe" value="136.4"></div>
-    <div><label for="fringeCash">Indennità in denaro (€/mese) <span class="help">paga vera (es. opt-out auto, voce Z.000463): entra in netto, IVS e base TFR</span></label><input type="number" id="fringeCash" value="0"></div>
+    <div><label for="fringe">Fringe benefit (€/mese) <span class="help">vantaggio in natura (es. auto aziendale): tasse sì, cassa e IVS no</span></label><input type="number" id="fringe" value="0"></div>
+    <div><label for="fringeCash">Indennità denaro (€/mese) <span class="help">paga vera in conto (es. opt-out auto, Z.000463): netto, IVS e base TFR</span></label><input type="number" id="fringeCash" value="0"></div>
    </div>
    <div class="sezione">Dove paghi le tasse <span class="sub">serve per le addizionali IRPEF regionale e comunale</span></div>
    <div class="row2">
@@ -125,10 +123,11 @@
     <div><label for="arrotN">Arrotondamento netto (€)</label><input type="number" id="arrotN" value="0"></div>
    </div>
    <p class="hint">Il mese dirigente è sempre pieno: 26 giornate retribuite (art. 4 c.6 TU) — ferie e
-   festività sono retribuite e non spostano la paga. I campi "Numeri veri del cedolino" servono solo se vuoi
-   ricalcare un cedolino Zucchetti reale (IRPEF, residui e arrotondamenti non sempre ricalcolabili). Fringe in
-   natura vs indennità in denaro: la prima è tassabile ma non è flusso di cassa né contributivo; la seconda
-   (è come Z.000463 del cedolino 03) è retribuzione piena: competenze, IVS, IRPEF e base TFR.</p>
+   festività sono retribuite e non spostano la paga. Tutti gli importi variabili partono da zero: inserisci
+   superminimo, SMM, fringe benefit e indennità denaro. I campi "Numeri veri del cedolino" servono solo per
+   ricalcare un cedolino Zucchetti reale. Fringe benefit vs indennità denaro: il primo è in natura, tassabile
+   ma non è flusso di cassa né contributivo; la seconda (come Z.000463 del cedolino 03) è retribuzione piena:
+   competenze, IVS, IRPEF e base TFR.</p>
   </div>
 
   <div>
@@ -272,7 +271,7 @@ function initMenu(){
 
 function run(){
  const minimo = TAB3.find(x=>x[0]===+document.getElementById('anno').value)[1];
- const supc=+document.getElementById('supc').value, smm=+document.getElementById('smm').value;
+ const smm=+document.getElementById('smm').value;
  const supi=+document.getElementById('supi').value, scatti=+document.getElementById('scatti').value;
  const ggRet=26, ggFer=0, ggFest=0;   // mese pieno standard (art. 4 c.6 TU); i giorni reali restano nel foglio Excel
  const fringe=+document.getElementById('fringe').value;
@@ -283,7 +282,7 @@ function run(){
  const arrotT=+document.getElementById('arrotT').value, arrotN=+document.getElementById('arrotN').value;
  const custom=document.getElementById('custom').checked;
  const regPct=+document.getElementById('regPct').value, comPct=+document.getElementById('comPct').value;
- const r=calc(minimo, supc, smm, supi, scatti, ggRet, ggFer, ggFest, fringe, ov, fringeCash);
+ const r=calc(minimo, 0, smm, supi, scatti, ggRet, ggFer, ggFest, fringe, ov, fringeCash);
 
  const regName=selReg.value, comName=selCom.value;
  const R=REG26[regName];
@@ -328,7 +327,7 @@ function run(){
  const tM=document.getElementById('mensile'); tM.innerHTML="";
  row(tM,["Voce","Importo"]);
  row(tM,["Retribuzione ("+ggRet+" gg \u00d7 "+r.giorn.toFixed(5)+")",eur(r2(ggRet*r.giorn))]);
- row(tM,["Indennità personale in denaro (es. autovettura)",eur(r2(fringeCash))]);
+ row(tM,["Indennità denaro",eur(r2(fringeCash))]);
  rowTot(tM,["= TOTALE COMPETENZE",eur(r.comp)]);
  row(tM,["− Contributo IVS 9,19%",eur(-r.ivsM)]);
  row(tM,["− Contributo IVS agg. 1% (sopra 56.224/12)",eur(-r.aggM)]);
@@ -343,14 +342,14 @@ function run(){
  row(tM,["− Arrotondamento trattenute (ZP9960)",eur(-arrotT)]);
  rowTot(tM,["= TOTALE TRATTENUTE",eur(tratt)]);
  rowTot(tM,["= NETTO DEL MESE",eur(nettoM)]);
- rowInfo(tM,["(Fringe benefit del mese: in natura, tassabile, non in cassa)",eur(fringe)]);
+ rowInfo(tM,["Fringe benefit",eur(fringe)]);
  rowInfo(tM,["Mese dirigente: 26 GG standard (art. 4 c.6 TU: ogni giornata = RME ÷ 26); ferie e festività le sostituiscono",""]);
 
  const tA=document.getElementById('annuale'); tA.innerHTML="";
  row(tA,["Voce","Importo annuo"]);
- row(tA,["RME — retribuzione mensile effettiva (minimo+sup.contr.+SMM 2016+S.MINIMO+scatti 2004)",eur(r.RME)]);
- row(tA,["Retr. base di contratto annua CCNL (minimo + SUP.CONTR + SMM 2016) × 14",eur((minimo+supc+smm)*PAR.mens)]);
- row(tA,["Superminimo individuale — S.MINIMO × 14 (la tua variabile personale)",eur(supi*PAR.mens)]);
+ row(tA,["RME — retribuzione mensile effettiva (minimo tabellare + SMM 2016 + superminimo ad personam + scatti 2004)",eur(r.RME)]);
+ row(tA,["Retr. base di contratto annua CCNL (minimo tabellare + SMM 2016) × 14",eur((minimo+smm)*PAR.mens)]);
+ row(tA,["Superminimo ad personam × 14 (SUP.CONTR + S.MINIMO, la tua variabile)",eur(supi*PAR.mens)]);
  rowTot(tA,["RAL — retribuzione annua effettiva (base di contratto + S.MINIMO + scatti)",eur(r.RAL),'tot']);
  row(tA,["− IVS 9,19% annua (fino al massimale 122.295 €)",eur(r.ivsA)]);
  row(tA,["− IVS agg. 1% annua (sopra 56.224 €)",eur(r.aggA)]);
@@ -379,7 +378,7 @@ function run(){
  const tC=document.getElementById('confronto'); tC.innerHTML="";
  row(tC,["Anno","Minimo mese","RME mese","RAL","IVS+agg.","Negri+FASDAC (dip.)","Imponibile","IRPEF netta","Add. reg.","Add. com.","Netto annuo","Netto/mese"],'num');
  TAB3.forEach(([anno, min])=>{
-  const c=calc(min, supc, smm, supi, scatti, PAR.ng, 0, 0, fringe, 0, 0);
+  const c=calc(min, 0, smm, supi, scatti, PAR.ng, 0, 0, fringe, 0, 0);
   const aa=addizionali(c.imp);
   const irpnC=Math.max(0,c.irpl-Math.min(c.ded,c.irpl));
   const nc=c.RAL-(c.ivsA+c.aggA+c.negriA+c.fasdacA+PAR.apAnn+c.formM*12+irpnC+aa.reg+aa.com);
