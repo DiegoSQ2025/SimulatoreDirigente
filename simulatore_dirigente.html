@@ -38,8 +38,10 @@
  input,select{padding:8px 10px;width:100%;border:1px solid #d5d9e2;border-radius:9px;font:inherit;
        background:#fff;color:var(--ink)}
  input:focus,select:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
- .row2{display:flex;gap:10px}
+ .row2{display:flex;gap:10px;align-items:flex-start}
  .row2>div{flex:1}
+ .help{display:block;font-weight:400;font-size:.75rem;color:var(--muted);line-height:1.35;margin-top:1px}
+ @media (max-width:640px){ .row2{display:block} .row2>div+div{margin-top:4px} }
  .sezione{margin:20px 0 4px;padding-top:14px;border-top:1px solid var(--line);
   font-size:.74rem;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--accent)}
  .card h2 + .sezione,.sezione:first-of-type{margin-top:6px;border-top:none;padding-top:0}
@@ -82,28 +84,28 @@
   <div class="card inputs">
    <h2>Parametri di partenza</h2>
    <div class="sezione">Il salario fisso <span class="sub">quello che entra ogni mese, prima di tasse e trattenute</span></div>
-   <label for="anno">Anno + minimo contrattuale mensile lordo (art. 5 TU, aggiornato dal rinnovo 5/11/2025: il minimo era 4.340,00 € dal 1°/7/2025)</label>
+   <label for="anno">Anno + minimo mensile lordo (art. 5) <span class="help">CCNL: 4.660 (2026) · 4.920 (2027) · 5.140 (2028); era 4.340 dal 1/7/2025</span></label>
    <select id="anno"><option selected value="2026">2026 — lordo mensile 4.660,00 € (dal 1°/1/2026)</option><option value="2027">2027 — lordo mensile 4.920,00 € (dal 1°/1/2027)</option><option value="2028">2028 — lordo mensile 5.140,00 € (dal 1°/1/2028)</option></select>
    <div class="row2">
-    <div><label for="supc">Minimo contrattuale — SUP.CONTR (€/mese): voce DI CONTRATTO che si somma al minimo art. 5, stessa per tutti i dirigenti del CCNL. NON è un superminimo: l'unico superminimo è l'S.MINIMO qui sotto</label><input type="number" id="supc" value="1317.48"></div>
-    <div><label for="smm">Bonus SMM 2016 (€/mese): vecchio aumento del 2016, resta fisso per tutti</label><input type="number" id="smm" value="350"></div>
+    <div><label for="supc">Minimo contrattuale — SUP.CONTR (€/mese) <span class="help">voce di contratto, uguale per tutti: NON è un superminimo (quello è solo l'S.MINIMO)</span></label><input type="number" id="supc" value="1317.48"></div>
+    <div><label for="smm">Bonus SMM 2016 (€/mese) <span class="help">aumento nazionale del 2016, fisso per tutti</span></label><input type="number" id="smm" value="350"></div>
    </div>
    <div class="row2">
-    <div><label for="supi">Superminimo personale — S.MINIMO (€/mese): EXTRA che l’azienda riconosce solo a te, negoziato col datore. È la tua variabile: copialo dal tuo cedolino</label><input type="number" id="supi" value="1656.80572"></div>
-    <div><label for="scatti">Anzianità pre-2004 (€/mese): solo chi era dirigente prima del luglio 2004, altrimenti 0</label><input type="number" id="scatti" value="0" min="0"></div>
+    <div><label for="supi">Superminimo personale — S.MINIMO (€/mese) <span class="help">la TUA variabile, negoziata con l’azienda: copiala dal cedolino</span></label><input type="number" id="supi" value="1656.80572"></div>
+    <div><label for="scatti">Anzianità pre-2004 (€/mese) <span class="help">solo per dirigenti assunti prima del luglio 2004</span></label><input type="number" id="scatti" value="0" min="0"></div>
    </div>
    <div class="sezione">Benefit e indennità <span class="sub">da inserire a mano: sono i vantaggi che non figgono tra le voci fisse</span></div>
    <div class="row2">
-    <div><label for="fringe">Fringe benefit IN NATURA (€/mese): un vantaggio ricevuto e non denaro (es. azienda auto messa a disposizione). Ci paghi le tasse sopra, ma NON passa in banca e NON paga contributi IVS</label><input type="number" id="fringe" value="136.4"></div>
-    <div><label for="fringeCash">Indennità IN DENARO (€/mese): soldi veri in busta (es. autovettura 261,30 del ced.03 se rinunci all’auto, voce Z.000463). È paga vera: entra nel netto, nell’IVS e nella base TFR</label><input type="number" id="fringeCash" value="0"></div>
+    <div><label for="fringe">Fringe benefit in natura (€/mese) <span class="help">vantaggio ricevuto, non denaro (es. auto aziendale): tasse sì, cassa e IVS no</span></label><input type="number" id="fringe" value="136.4"></div>
+    <div><label for="fringeCash">Indennità in denaro (€/mese) <span class="help">paga vera (es. opt-out auto, voce Z.000463): entra in netto, IVS e base TFR</span></label><input type="number" id="fringeCash" value="0"></div>
    </div>
    <div class="sezione">Il mese da simulare <span class="sub">ferie e festività sono comunque retribuite: toccano il totale solo i giorni NON pagati</span></div>
    <div class="row2">
     <div><label for="ggRet">Giorni pagati (26 = mese pieno)</label><input type="number" id="ggRet" value="25" min="0" max="26"></div>
-    <div><label for="ggFer">Ferie usate (retribuite: selezionali solo per il dettaglio)</label><input type="number" id="ggFer" value="1" min="0" max="26"></div>
+    <div><label for="ggFer">Ferie usate <span class="help">retribuite: solo dettaglio, non toccano il netto</span></label><input type="number" id="ggFer" value="1" min="0" max="26"></div>
    </div>
    <div class="row2">
-    <div><label for="ggFest">Festività o permessi (retribuiti)</label><input type="number" id="ggFest" value="1" min="0" max="26"></div>
+    <div><label for="ggFest">Festività o permessi <span class="help">retribuiti: solo dettaglio</span></label><input type="number" id="ggFest" value="1" min="0" max="26"></div>
     <div></div>
    </div>
    <div class="sezione">Dove paghi le tasse <span class="sub">serve per le addizionali IRPEF regionale e comunale</span></div>
@@ -118,16 +120,16 @@
     · comunale % <input type="number" id="comPct" value="0.90" step="0.01" aria-label="Aliquota addizionale comunale %"></div>
    <div class="sezione">Numeri veri del cedolino <span class="sub">AVANZATO: compila solo se vuoi ricalcare un cedolino Zucchetti reale al centesimo; se valgono 0 il simulatore calcola da solo</span></div>
    <div class="row2">
-    <div><label for="irpOv">IRPEF lorda del mese scritta nel cedolino</label><input type="number" id="irpOv" value="2755.77"></div>
-    <div><label for="regRes">Residuo 2025 dell’addizionale regionale (si paga nell’anno dopo)</label><input type="number" id="regRes" value="253.95"></div>
+    <div><label for="irpOv">IRPEF lorda del mese (dal cedolino)</label><input type="number" id="irpOv" value="2755.77"></div>
+    <div><label for="regRes">Residuo 2025 add. regionale <span class="help">saldo dell’anno prima, pagato nell’anno dopo</span></label><input type="number" id="regRes" value="253.95"></div>
    </div>
    <div class="row2">
-    <div><label for="comRes">Residuo 2025 dell’addizionale comunale</label><input type="number" id="comRes" value="52.97"></div>
-    <div><label for="acconto">Acconto sulle addizionali già trattenuto nel 2025</label><input type="number" id="acconto" value="27.33"></div>
+    <div><label for="comRes">Residuo 2025 add. comunale</label><input type="number" id="comRes" value="52.97"></div>
+    <div><label for="acconto">Acconto addizionali (già trattenuto)</label><input type="number" id="acconto" value="27.33"></div>
    </div>
    <div class="row2">
-    <div><label for="arrotT">Arrotondamento sulle trattenute (€, come da cedolino)</label><input type="number" id="arrotT" value="0.03"></div>
-    <div><label for="arrotN">Arrotondamento del netto (€, come da cedolino)</label><input type="number" id="arrotN" value="0.53"></div>
+    <div><label for="arrotT">Arrotondamento trattenute (€)</label><input type="number" id="arrotT" value="0.03"></div>
+    <div><label for="arrotN">Arrotondamento netto (€)</label><input type="number" id="arrotN" value="0.53"></div>
    </div>
    <p class="hint">Default caricati dal cedolino Zucchetti di controllo (liv. 5, 25 gg + 1 ferie + 1 festività):
    congiunta con i residui di addizionali 2025 replica il netto 4.184,00 €. Azzera i "Numeri veri del
