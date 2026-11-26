@@ -60,7 +60,7 @@ RME = MINIMO + SUP.CONTR + SMM 2016 + S.MINIMO + scatti pre-2004
 |---|---|---|
 | MINIMO (art. 5) | tabellare CCNL, dal menu anno: 4.660 (2026) / 4.920 (2027) / 5.140 (2028) | 4.660,00 |
 | **SUP.CONTR** | **superminimo da contratto** — quota fissa che supera il minimo tabellare, concordata individualmente nella lettera di assunzione per raggiungere la RAL pattuita (definizione utente) | 1.317,48 |
-| SMM 2016 | aumento nazionale transitorio 2016, fisso per tutti | 350,00 |
+| SMM 2016 | aumento nazionale transitorio 2016, fisso per tutti; **non assorbito dai minimi 2026-2028** (rinnovo 21/7/2016: voce separata dal minimo, assorbibile solo da aumenti aziendali con clausola espressa; rinnovo 5/11/2025: i nuovi aumenti 320/260/220 vanno nel minimo e non assorbono trattamenti individuali) | 350,00 |
 | **S.MINIMO** | **superminimo individuale** — negoziato col singolo dirigente | 1.656,80572 |
 | scatti pre-2004 | solo dirigenti assunti prima del 1/7/2004 (+258,22/mese) | 0 |
 
