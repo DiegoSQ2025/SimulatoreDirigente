@@ -41,7 +41,7 @@ check('numero enti regionali nel menu', get('regione').options.length, 21, 0);
 check('default regione', get('regione').value, 'Lazio');
 check('default comune', get('comune').value, 'Roma');
 check('righe confronto minimi CCNL (header + 3 anni)', get('confronto').rows.length - 1, 3, 0);
-check('label SUP.CONTR chiara (nazionale)', /nazionale/i.test(get('supc').labels[0].textContent) ? 1 : 0, 1, 0);
+check('label SUP.CONTR chiara (di contratto, uguale per tutti)', /uguale per tutti/i.test(get('supc').labels[0].textContent) ? 1 : 0, 1, 0);
 check('label S.MINIMO chiara (personale)', /personale/i.test(get('supi').labels[0].textContent) ? 1 : 0, 1, 0);
 
 /* scenario 1: preset identico al cedolino Zucchetti (dirigente Liv. 5, GG 25+1+1, Lazio/Roma, override conguaglio) */
