@@ -8,6 +8,8 @@
 3. Casi limite addizionali MEF.
 4. Benchmark Zucchetti (cedolino dirigente liv. 5, Lazio/Roma, 2004->2026):
    comp 8.291,38, trattenute 4.107,91, netto 4.184,00.
+5. Benchmark secondo cedolino Zucchetti (dirigente 03, stesso datore, RME 12.857,14):
+   comp 13.612,95, base IVS arrotondata 13.613,00, trattenute 6.817,53, netto 6.796,00.
 """
 import os
 import shutil
@@ -66,15 +68,15 @@ def detrazione13(rld):
 
 
 def py_calc(anno=2026, supc=1317.48, smm=350.0, supi=1656.80572, scatti=0.0,
-            ggRet=25, ggFer=1, ggFest=1, fringe=136.4, ov=2755.77,
+            ggRet=25, ggFer=1, ggFest=1, fringe=136.4, fringeCash=0.0, ov=2755.77,
             regRes=253.95, comRes=52.97, acconto=27.33, arrotT=0.03, arrotN=0.53,
             oneri=0.0, regione="Lazio", comune="Roma"):
-    """Regole dirigente 2026 riconciliate col cedolino Zucchetti liv.5 Lazio/Roma."""
+    """Regole dirigente 2026 riconciliate coi cedolini Zucchetti 01 e 03 (Lazio/Roma)."""
     minimo = MINIMI[str(anno)]
     RME = minimo + supc + smm + supi + scatti
     giorn = RME / NG
-    comp = r2(ggRet * giorn) + r2(ggFer * giorn) + r2(ggFest * giorn)
-    base_m = float(int(comp))
+    comp = r2(ggRet * giorn) + r2(ggFer * giorn) + r2(ggFest * giorn) + r2(fringeCash)
+    base_m = float(int(comp + 0.5))   # Zucchetti ARROTONDA all'euro (ced.03: 13.612,95 -> 13.613,00)
     ivsM = r2(base_m * INPS)
     aggM = r2(max(0.0, base_m - AGG_SOG / 12) * AGG_ALQ)
     negriM = r2(MN_BASE / 12 * MN_D)
@@ -89,7 +91,7 @@ def py_calc(anno=2026, supc=1317.48, smm=350.0, supi=1656.80572, scatti=0.0,
     negriA = MN_BASE * MN_D
     fasdacA = FD_BASE * FD_D
     rld = RAL - ivsA - aggA - negriA
-    imp = rld + fringe * 12
+    imp = rld + (fringe + fringeCash) * 12
     irpl = scaglioni(imp)
     ded = detrazione13(rld)
     dede = min(ded, irpl)
@@ -121,6 +123,7 @@ IN_LABELS = {
     "ggFer": "Giorni di ferie godute",
     "ggFest": "Giorni festivita'/permessi",
     "fringe": "Fringe benefit mensile",
+    "fringeCash": "Fringe benefit INCASSATO (mensile",
     "ov": "IRPEF lorda del mese \u2014 override",
     "regRes": "Add. regionale del mese \u2014 residuo",
     "comRes": "Add. comunale del mese \u2014 residuo",
@@ -226,7 +229,7 @@ def xls_calc(case, rows, model):
         return keys[up]
 
     defaults = dict(anno=2026, supc=1317.48, smm=350.0, supi=1656.80572, scatti=0.0,
-                    ggRet=25, ggFer=1, ggFest=1, fringe=136.4, ov=2755.77,
+                    ggRet=25, ggFer=1, ggFest=1, fringe=136.4, fringeCash=0.0, ov=2755.77,
                     regRes=253.95, comRes=52.97, acconto=27.33, arrotT=0.03,
                     arrotN=0.53, oneri=0.0, regione="Lazio", comune="Roma")
     defaults.update(case)
@@ -268,6 +271,9 @@ CASES = [
     dict(nome="anno 2028 + oneri conguaglio", case=dict(anno=2028, oneri=530.0)),
     dict(nome="scatti pre-2004 +258,22", case=dict(scatti=258.22)),
     dict(nome="superminimi Others", case=dict(supc=1500.0, supi=2000.0, smm=0.0)),
+    dict(nome="cedolino 03 (dirigente 03: RME 12.857, autovettura)", case=dict(
+        supc=0.0, supi=7847.14, ggRet=26, ggFer=0, ggFest=1, fringe=0.0, fringeCash=261.30,
+        ov=4810.85, regRes=345.82, comRes=64.12, acconto=36.43, arrotT=0.13, arrotN=0.58)),
 ]
 
 SOGLIE = [
@@ -316,6 +322,30 @@ ZUCCHETTI = [
     ("Zucchetti: addizionale comunale annua Roma", "comA", 912.64),
 ]
 
+D03 = dict(anno=2026, supc=0.0, supi=7847.14, ggRet=26, ggFer=0, ggFest=1,
+           fringe=0.0, fringeCash=261.30, ov=4810.85, regRes=345.82, comRes=64.12,
+           acconto=36.43, arrotT=0.14, arrotN=0.58)   # arrotT 0,14 = ZP9960 0,13 del cedolino + 0,01 rounding IVS Zucchetti (vedi README)
+ZUCCHETTI_03 = [
+    ("ced.03: RME 12.857,14", "RME", 12857.14),
+    ("ced.03: retr. giornaliera 494,50538", "giorn", 494.50538),
+    ("ced.03: TOTALE COMPETENZE 13.612,95 (26gg + fest. + autovettura)", "comp", 13612.95),
+    ("ced.03: base IVS arrotondata 13.613,00 -> IVS 1.251,03 (cedolino 1.251,04, scarto 0,01)", "ivsM", 1251.03),
+    ("ced.03: IVS agg. 1% 89,28", "aggM", 89.28),
+    ("ced.03: Fondo Mario Negri 98,71", "negriM", 98.71),
+    ("ced.03: FASDAC 71,59", "fasdacM", 71.59),
+    ("ced.03: A. Pastore 38,73", "pastM", 38.73),
+    ("ced.03: formazione 10,83", "formM", 10.83),
+    ("ced.03: IRPEF lorda 4.810,85 (override)", "irpm", 4810.85),
+    ("ced.03: add. reg. 345,82", "regM", 345.82),
+    ("ced.03: add. com. 64,12", "comM", 64.12),
+    ("ced.03: TOTALE TRATTENUTE 6.817,53", "tratt", 6817.53),
+    ("ced.03: NETTO DEL MESE 6.796,00", "nettoM", 6796.00),
+    ("ced.03: RAL 179.999,96", "RAL", 179999.96),
+    ("ced.03: RAL base di contratto 5.010 x 14 = 70.140,00", "ralBase", 70140.00),
+    ("ced.03: superminimo individuale annuo 109.859,96", "supiA", 109859.96),
+    ("ced.03: imponibile IRPEF annuo (RLD + autovettura x 12) = 169.474,40", "imp", 169474.40),
+]
+
 
 def main():
     rows = find_rows()
@@ -324,7 +354,7 @@ def main():
     for entry in CASES:
         nome, case = entry["nome"], entry["case"]
         c = dict(anno=2026, supc=1317.48, smm=350.0, supi=1656.80572, scatti=0.0,
-                 ggRet=25, ggFer=1, ggFest=1, fringe=136.4, ov=2755.77,
+                 ggRet=25, ggFer=1, ggFest=1, fringe=136.4, fringeCash=0.0, ov=2755.77,
                  regRes=253.95, comRes=52.97, acconto=27.33, arrotT=0.03,
                  arrotN=0.53, oneri=0.0, regione="Lazio", comune="Roma")
         c.update(case)
@@ -359,15 +389,25 @@ def main():
         else:
             print(f"  OK   {nome} = {refz[k]:.2f}")
 
+    refz3 = py_calc(**D03)
+    for nome, k, exp in ZUCCHETTI_03:
+        if abs(refz3[k] - exp) > TOLL:
+            fails.append(f"{nome}: got={refz3[k]:.2f} exp={exp:.2f}")
+            print(f"  FAIL {nome}")
+        else:
+            print(f"  OK   {nome} = {refz3[k]:.2f}")
+
     print()
     if fails:
         print(f"ESITO: {len(fails)} FALLIMENTI ({len(CASES)} casi x {len(OUT_LABELS)} "
-              f"confronti, {tot_checked} totale; {len(SOGLIE)} soglie; {len(ZUCCHETTI)} verifiche Zucchetti)")
+              f"confronti, {tot_checked} totale; {len(SOGLIE)} soglie; "
+              f"{len(ZUCCHETTI)+len(ZUCCHETTI_03)} verifiche Zucchetti)")
         for f in fails:
             print(" -", f)
         return 1
     print(f"ESITO: TUTTI I TEST PASSATI ({len(CASES)} casi, {tot_checked} confronti "
-          f"cella per cella tolleranza {TOLL} \u20ac, {len(SOGLIE)} soglie, {len(ZUCCHETTI)} verifiche Zucchetti)")
+          f"cella per cella tolleranza {TOLL} \u20ac, {len(SOGLIE)} soglie, "
+          f"{len(ZUCCHETTI)+len(ZUCCHETTI_03)} verifiche Zucchetti)")
 
     print()
     print("=== BENCHMARK (2026, GG 25+1+1 come cedolino, senza override) ===")

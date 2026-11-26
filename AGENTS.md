@@ -53,11 +53,18 @@ ACCESSIBILITÀ: ogni input/select deve avere una label (`for`/`id`) o `aria-labe
 - **Rateizzazione mensile addizionali = annua ÷ 12** (12 rate, anche con 14 mensilità). Le buste 13ª/14ª portano solo il netto in busta (nessuna addizionale extra).
 - NON inclusi: TFR (art. 43 TU: devoluzione o liquidazione a tassazione separata — fuori scopo), trattamento integrativo/somma cuneo L. 207/24, detrazioni per casi particolari (vedi Leggimi).
 
-## Riconciliazione cedolino Zucchetti (al centesimo)
+## Riconciliazione cedolino Zucchetti 01 (al centesimo)
 MINIMO 4.660,00 + SUP.CONTR 1.317,48 + SMM 2016 350,00 + S.MINIMO 1.656,81 = **RME 7.984,29** = 307,08791 × 26 gg.
 COMPETENZE: retribuzione 25 gg 7.677,20 + ferie 307,09 + festiv. 307,09 = **8.291,38**.
 Trattenute: IVS **761,94** + agg **36,06** + Negri **98,71** + FASDAC **71,59** + Pastore **38,73** + formazione **10,83** + IRPEF lorda **2.755,77** (override: annualizzazione Zucchetti) + add.reg. residuo **253,95** + add.com. residuo **52,97** + acconto addiz. **27,33** + arrotondamento trattenute **0,03** = **4.107,91**.
 **Netto = 8.291,38 − 4.107,91 + 0,53 (arrotondamento netto) = 4.184,00** ✓.
+
+### Secondo caso di verifica: cedolino Zucchetti "dirigente 03" (stesso datore cod. azienda 000294, RME 12.857,14)
+- **Intestazione SENZA SUP.CONTR**: MINIMO 4.660 + AUM.RETR. 500 + SMM 2016 350 + S.MINIMO 6.489,99714 + Ad Pers. 857,14286 = 12.857,14 = 494,50538 x 26 gg. Nel simulatore: supc=0 e supi=7.847,14 (AUM.RETR. + S.MINIMO + Ad Pers. sono componenti individuali da sommare). NON dichiarare piu' SUP.CONTR "uguale per tutti"
+- **Fringe INCASSATO** (nuovo input `fringeCash`/"Fringe benefit INCASSATO"): l'indennita' autovettura 261,30 (Z.000463) entra in COMPETENZE, base IVS e IRPEF (diverso dal fringe in natura del ced.01, che resta fuori cassa e IVS). comp = retr. + ferie + fest. + fringeCash
+- Riconciliato: comp 13.612,95 (26gg + 1 fest. 494,51 + 261,30), base IVS 13.613,00 (ROUND), IVS 1.251,03 (cedolino 1.251,04, scarto 0,01), agg 89,28, trattenute 6.817,53 (con arrotT 0,14 = ZP9960 0,13 + 0,01 IVS), NETTO 6.796,00; RAL 179.999,96 = ralBase 70.140,00 + supiA 109.859,96
+- `test_simulatore.py`: caso in CASES ("cedolino 03") + blocco `ZUCCHETTI_03` (18 verifiche, dict D03); `test_html.js`: scenario 1bis ced.03.
+- Peculiarita': nei DUE cedolini Zucchetti le trattenute residue hanno un +0,01 (F09110 residuo 345,81 vs trattenuta 345,82) e l'imponibile IRPEF porta un FISSO +309,78/mese (probabile valuta auto forfettizzata della flotta aziendale) non modellabile: coperti da override
 
 ### Non riconciliabili (documentati in Leggimi e nel codice, gestiti con override)
 - **Imponibile IRPEF Zucchetti 7.704,45/mese** (107.862,30 annualizzato vs modello 101.404,17: gap ~586 €/mese) — Zucchetti annualizza con conguagli propri; si replica con l'override "IRPEF lorda del mese" = 2.755,77.
@@ -67,7 +74,7 @@ Trattenute: IVS **761,94** + agg **36,06** + Negri **98,71** + FASDAC **71,59** 
 
 ## Insidie note (bug già risolti o scoperti — NON reintrodurli)
 1. **IRPEF mese ≠ annua/12**: per i dirigenti (14 mensilità) è **annua/14**. Per le addizionali invece è **annua/12** in entrambe le versioni (dipendente e dirigente è /12). Confondere i due divisorismi altera il netto di centinaia di euro
-2. **BASE IVS mensile FLOOR all'euro (Zucchetti)**: il gestionale applica la percentuale sulla base mensile arrotondata all'euro (FLOOR(8.291,38, 1) = 8.291,00 → 761,94, NON 761,98). In Excel `=ROUND(FLOOR(base,1)*aliquota,2)`; in Python `float(int(comp))`; in JS `Math.floor(comp)`
+2. **BASE IVS mensile ARROTONDATA all'euro (Zucchetti)**: il gestionale applica la percentuale sulla base mensile arrotondata all'euro (ced.01: 8.291,38 → 8.291,00 → 761,94; ced.03: 13.612,95 → 13.613,00 → 8.928,00 x 1% = 89,28). Il cedolino 03 dimostra che è ROUND è non FLOOR (13.612,95 troncato sarebbe 13.612): in Excel `=ROUND(ROUND(base,0)*aliquota,2)`; in Python `int(comp + 0.5)`; in JS `Math.round(comp)`. Nota: su base 13.613,00 il cedolino 03 mostra IVS 1.251,04 mentre 13.613 x 9,19% = 1.251,0347 → 1.251,03 (scarto 0,01 del gestionale, assorbito negli arrotondamenti ZP9960: nel caso ced.03 l'input arrotT usato è 0,14 non 0,13)
 3. **Arrotondamenti Zucchetti**: ZP9960 arrotondamento 0,03 è una voce DENTRO LE TRATTENUTE; l'arrotondamento netto 0,53 si aggiunge al netto. Servono due input separati
 4. **S.MINIMO esatto**: 1.656,80572 (display 1.656,81) — usare il valore pieno per combaciare col rate 307,08791 × 26
 5. **Pastore annuo**: usare **464,81** (AP_ANN/apAnn) e non 38,73×12 = 464,76 — altrimenti netto annuo di 5 centesimi sbagliato
@@ -80,7 +87,7 @@ Trattenute: IVS **761,94** + agg **36,06** + Negri **98,71** + FASDAC **71,59** 
 12. **Monitoraggi**: delibere comunali 2026 (`gen_addizionali.py`), Legge di Bilancio 2027, circolare INPS valori gennaio, tabelle fondi dopo ogni rinnovo CCNL (fondonegri.it, fasdac.it, associazionepastore.it)
 
 ## Protocollo di verifica (obbligatorio prima di qualsiasi push)
-1. **`python3 test_simulatore.py`** deve stampare "TUTTI I TEST PASSATI": replica Python (`py_calc`, addizionale_lib) vs motore `formulas` sull'xlsx (10 casi × 28 output, tolleranza 0,01 €), 12 casi soglia addizionali, **18 verifiche assolute Zucchetti** (comp 8.291,38 · IVS 761,94 · Negri 98,71 · FASDAC 71,59 · Pastore 38,73 · IRPEF 2.755,77 · trattenute 4.107,91 · netto 4.184,00 · RAL 111.780 · regA 3.136,76 · comA 912,64)
+1. **`python3 test_simulatore.py`** deve stampare "TUTTI I TEST PASSATI": replica Python (`py_calc`, addizionale_lib) vs motore `formulas` sull'xlsx (11 casi × 30 output, tolleranza 0,01 €), 12 casi soglia addizionali, **38 verifiche assolute Zucchetti (20 ced.01 + 18 ced.03)** (comp 8.291,38 · IVS 761,94 · Negri 98,71 · FASDAC 71,59 · Pastore 38,73 · IRPEF 2.755,77 · trattenute 4.107,91 · netto 4.184,00 · RAL 111.780 · regA 3.136,76 · comA 912,64)
 2. **Scan errori**: nessuna cella `#REF!`/`#VALUE!`/ecc.
 3. **`node test_html.js`** (jsdom da `/tmp/node_modules`): 21 enti, default Lazio/Roma, preset Zucchetti completo al centesimo, mese pulito, 26 gg, Lombardia/Milano, 2027, nessun NaN/Infinity, accessibilità label
 4. **Benchmark dopo ogni rebuild** (2026 Lazio/Roma, GG 25+1+1, fringe 136,40): preset pubblico netto 4.184,00; auto (senza conguagli) netto 4.378,66 (IRPEF 2.557,41 = annua/14, add.reg. 261,40 = annua/12); mese pieno 26 gg netto 4.158,89; RAL 111.780, imponibile 101.404,17, netto annuo 58.460,33 (→ 4.175,74/mese); 2027 netto annuo 60.185,43; 2028 netto annuo 61.645,12

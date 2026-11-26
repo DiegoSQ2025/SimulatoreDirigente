@@ -47,7 +47,7 @@ check('label S.MINIMO chiara (personale)', /personale/i.test(get('supi').labels[
 /* scenario 1: preset identico al cedolino Zucchetti (dirigente Liv. 5, GG 25+1+1, Lazio/Roma, override conguaglio) */
 check('mensile: retribuzione 25 gg', rowValue('mensile', 'Retribuzione ('), 7677.20);
 check('mensile: TOTALE COMPETENZE', rowValue('mensile', '= TOTALE COMPETENZE'), 8291.38);
-check('mensile: IVS 9,19% (FLOOR euro 8.291,00)', val('mensile', 'Contributo IVS 9,19%'), 761.94);
+check('mensile: IVS 9,19% (ROUND euro 8.291,00)', val('mensile', 'Contributo IVS 9,19%'), 761.94);
 check('mensile: IVS agg. 1%', val('mensile', 'IVS agg. 1%'), 36.06);
 check('mensile: Fondo Mario Negri 2%', val('mensile', 'Fondo Mario Negri 2%'), 98.71);
 check('mensile: FASDAC 1,87%', val('mensile', 'FASDAC 1,87%'), 71.59);
@@ -82,8 +82,32 @@ check('annuale: addizionale comunale Roma', rowValue('annuale', 'Addizionale com
 check('annuale: NETTO ANNUO in busta', rowValue('annuale', 'NETTO ANNUO in busta'), 58460.33);
 check('annuale: netto medio per mensilita', rowValue('annuale', 'Netto medio per mensilit'), 4175.74);
 
+/* scenario 1bis: cedolino 03 (dirigente 03, RME 12.857,14: supc=0, supi=7.847,14, 26gg+1 fest., autovettura incassata) */
+['supc', 'supi', 'scatti', 'ggRet', 'ggFer', 'ggFest', 'fringe', 'fringeCash',
+ 'irpOv', 'regRes', 'comRes', 'acconto', 'arrotT', 'arrotN'].forEach(id => set(id, '0'));
+set('supi', '7847.14'); set('ggRet', '26'); set('ggFest', '1'); set('fringeCash', '261.30');
+set('irpOv', '4810.85'); set('regRes', '345.82'); set('comRes', '64.12');
+set('acconto', '36.43'); set('arrotT', '0.14'); set('arrotN', '0.58');
+check('ced.03: retribuzione 26 gg 494,50538', rowValue('mensile', 'Retribuzione ('), 12857.14);
+check('ced.03: festivita non goduta 494,51', val('mensile', 'Festività/permessi'), 494.51);
+check('ced.03: indennità autovettura incassata', val('mensile', 'Indennità fringe incassata'), 261.30);
+check('ced.03: TOTALE COMPETENZE 13.612,95', rowValue('mensile', '= TOTALE COMPETENZE'), 13612.95);
+check('ced.03: IVS 1.251,03 su base arrotondata 13.613,00 (cedolino 1.251,04, scarto 0,01 in ZP9960)', val('mensile', 'Contributo IVS 9,19%'), 1251.03);
+check('ced.03: IVS agg. 1% 89,28', val('mensile', 'IVS agg. 1%'), 89.28);
+check('ced.03: IRPEF lorda override', val('mensile', 'IRPEF lorda'), 4810.85);
+check('ced.03: add. regionale 345,82', val('mensile', 'Addizionale regionale'), 345.82);
+check('ced.03: TOTALE TRATTENUTE 6.817,53', rowValue('mensile', '= TOTALE TRATTENUTE'), 6817.53);
+check('ced.03: NETTO DEL MESE 6.796,00', rowValue('mensile', '= NETTO DEL MESE'), 6796.00);
+check('ced.03: kpi netto', kpi('kpiNettoM'), 6796.00);
+check('ced.03: kpi RAL 179.999,96', kpi('kpiRAL'), 179999.96);
+check('ced.03: RAL base di contratto 70.140,00', rowValue('annuale', 'Retr. base di contratto'), 70140.00);
+check('ced.03: superminimo individuale annuo 109.859,96', rowValue('annuale', 'Superminimo individuale'), 109859.96);
+check('ced.03: RAL effettiva 179.999,96', rowValue('annuale', 'RAL \u2014 retribuzione annua effettiva'), 179999.96);
+
 /* scenario 2: mese pulito senza conguagli (override a 0, GG come cedolino) */
 ['irpOv', 'regRes', 'comRes', 'acconto', 'arrotT', 'arrotN'].forEach(id => set(id, '0'));
+set('supc', '1317.48'); set('supi', '1656.80572'); set('ggRet', '25'); set('ggFer', '1');
+set('ggFest', '1'); set('fringe', '136.4'); set('fringeCash', '0');
 check('pulito: TRATTENUTE', rowValue('mensile', '= TOTALE TRATTENUTE'), 3912.72);
 check('pulito: IRPEF lorda annua/14', val('mensile', 'IRPEF lorda'), 2557.41);
 check('pulito: add. regionale annua/12', val('mensile', 'Addizionale regionale'), 261.40);

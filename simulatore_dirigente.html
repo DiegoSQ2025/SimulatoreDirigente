@@ -94,6 +94,7 @@
    <div class="row2">
     <div><label for="ggFest">Giorni festività/permessi</label><input type="number" id="ggFest" value="1" min="0" max="26"></div>
     <div><label for="fringe">Fringe benefit mensile (in natura, €)</label><input type="number" id="fringe" value="136.4"></div>
+    <div><label for="fringeCash">Fringe benefit INCASSATO (€/mese, es. autovettura: entra in competenze, IVS e IRPEF)</label><input type="number" id="fringeCash" value="0"></div>
    </div>
    <div class="row2">
     <div><label for="regione">Regione (addizionale IRPEF)</label><select id="regione"></select></div>
@@ -119,7 +120,7 @@
    </div>
    <p class="hint">Default caricati dal cedolino Zucchetti di controllo (liv. 5, 25 gg + 1 ferie + 1 festività):
    congiunta con i residui di addizionali 2025 replica il netto 4.184,00 €. Azzera gli override per una
-   mensilità "pulita". Il fringe benefit è in natura: tassabile, ma non flusso di cassa.</p>
+   mensilità "pulita". Il fringe benefit in natura è tassabile ma non è flusso di cassa; quello INCASSATO (es. autovettura del cedolino 03) entra invece in competenze, IVS e IRPEF.</p>
   </div>
 
   <div>
@@ -209,11 +210,11 @@ function detrazioneArt13(rld){
  return ded;
 }
 /* ---- Calcolo completo dirigente ---- */
-function calc(minimo, supc, smm, supi, scatti, ggRet, ggFer, ggFest, fringe, ov){
+function calc(minimo, supc, smm, supi, scatti, ggRet, ggFer, ggFest, fringe, ov, fringeCash){
  const RME = minimo + supc + smm + supi + scatti;
  const giorn = RME / PAR.ng;
- const comp = r2(ggRet*giorn) + r2(ggFer*giorn) + r2(ggFest*giorn);
- const ivsBase = Math.floor(comp);
+ const comp = r2(ggRet*giorn) + r2(ggFer*giorn) + r2(ggFest*giorn) + r2(fringeCash);
+ const ivsBase = Math.round(comp);
  const ivsM = r2(ivsBase * PAR.inps);
  const aggM = r2(Math.max(0, ivsBase - PAR.aggSog/12) * PAR.aggAlq);
  const negriM = r2(PAR.mnBase/12 * PAR.mnD);
@@ -227,7 +228,7 @@ function calc(minimo, supc, smm, supi, scatti, ggRet, ggFer, ggFest, fringe, ov)
  const negriA = PAR.mnBase*PAR.mnD;
  const fasdacA = PAR.fdBase*PAR.fdD;
  const rld = RAL - ivsA - aggA - negriA;
- const imp = rld + fringe*12;
+ const imp = rld + (fringe + fringeCash)*12;
  const irpl = irpefLorda(imp);
  const ded = detrazioneArt13(rld);
  const dede = Math.min(ded, irpl);
@@ -267,13 +268,14 @@ function run(){
  const supi=+document.getElementById('supi').value, scatti=+document.getElementById('scatti').value;
  const ggRet=+document.getElementById('ggRet').value, ggFer=+document.getElementById('ggFer').value;
  const ggFest=+document.getElementById('ggFest').value, fringe=+document.getElementById('fringe').value;
+ const fringeCash=+document.getElementById('fringeCash').value;
  const ov=+document.getElementById('irpOv').value;
  const regRes=+document.getElementById('regRes').value, comRes=+document.getElementById('comRes').value;
  const acconto=+document.getElementById('acconto').value;
  const arrotT=+document.getElementById('arrotT').value, arrotN=+document.getElementById('arrotN').value;
  const custom=document.getElementById('custom').checked;
  const regPct=+document.getElementById('regPct').value, comPct=+document.getElementById('comPct').value;
- const r=calc(minimo, supc, smm, supi, scatti, ggRet, ggFer, ggFest, fringe, ov);
+ const r=calc(minimo, supc, smm, supi, scatti, ggRet, ggFer, ggFest, fringe, ov, fringeCash);
 
  const regName=selReg.value, comName=selCom.value;
  const R=REG26[regName];
@@ -320,6 +322,7 @@ function run(){
  row(tM,["Retribuzione ("+ggRet+" gg \u00d7 "+r.giorn.toFixed(5)+")",eur(r2(ggRet*r.giorn))]);
  row(tM,["Ferie godute ("+ggFer+" gg)",eur(r2(ggFer*r.giorn))]);
  row(tM,["Festività/permessi ("+ggFest+" gg)",eur(r2(ggFest*r.giorn))]);
+ row(tM,["Indennità fringe incassata (es. autovettura)",eur(r2(fringeCash))]);
  rowTot(tM,["= TOTALE COMPETENZE",eur(r.comp)]);
  row(tM,["− Contributo IVS 9,19%",eur(-r.ivsM)]);
  row(tM,["− Contributo IVS agg. 1% (sopra 56.224/12)",eur(-r.aggM)]);
@@ -350,7 +353,7 @@ function run(){
  row(tA,["− A. Pastore annuo (464,81 €; detraibile 19% max 530 a conguaglio)",eur(PAR.apAnn)]);
  row(tA,["− Fondo formazione Mario Negri annuo",eur(r.formM*12)]);
  row(tA,["= RLD — reddito di riferimento (RAL − IVS − agg. − Negri)",eur(r.rld),'tot']);
- row(tA,["= Imponibile IRPEF annuo (RLD + fringe × 12)",eur(r.imp),'tot']);
+ row(tA,["= Imponibile IRPEF annuo (RLD + fringe × 12 + fringe incassata × 12)",eur(r.imp),'tot']);
  row(tA,["IRPEF lorda annua — L. 199/2025 (23% / 33% / 43%)",eur(r.irpl)]);
  row(tA,["− Detrazione lavoro dip. art. 13 TUIR (sul RLD)",eur(r.dede)]);
  row(tA,["= IRPEF NETTA annua",eur(r.irpn),'tot']);
@@ -370,7 +373,7 @@ function run(){
  const tC=document.getElementById('confronto'); tC.innerHTML="";
  row(tC,["Anno","Minimo mese","RME mese","RAL","IVS+agg.","Negri+FASDAC (dip.)","Imponibile","IRPEF netta","Add. reg.","Add. com.","Netto annuo","Netto/mese"],'num');
  TAB3.forEach(([anno, min])=>{
-  const c=calc(min, supc, smm, supi, scatti, PAR.ng, 0, 0, fringe, 0);
+  const c=calc(min, supc, smm, supi, scatti, PAR.ng, 0, 0, fringe, 0, 0);
   const aa=addizionali(c.imp);
   const irpnC=Math.max(0,c.irpl-Math.min(c.ded,c.irpl));
   const nc=c.RAL-(c.ivsA+c.aggA+c.negriA+c.fasdacA+PAR.apAnn+c.formM*12+irpnC+aa.reg+aa.com);
