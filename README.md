@@ -28,10 +28,10 @@ Tool di simulazione **dal lordo al netto** per **dirigenti del CCNL Terziario, D
 
 La pagina mostra ora entrambe le RAL separatamente: **RAL base di contratto** = (minimo + SUP.CONTR + SMM 2016) × 14 (88.584,72 € nel cedolino 01; 70.140,00 € nel cedolino 03) e **superminimo individuale** × 14 (23.195,28 € ced.01; 109.859,96 € ced.03) → RAL di fatto 111.780,00 € (ced.01) e 179.999,96 € (ced.03). Le giornate standard del mese dirigente sono **26** (art. 4 c.6 TU: ogni giornata vale RME ÷ 26; ferie e festività le sostituiscono una a una).
 
-**Fringe benefit: due tipologie**, entrambe come variabili manuali:
+**Fringe benefit (art. 51 TUIR) e indennità personale in denaro: due voci concettualmente diverse**, entrambe variabili manuali:
 
-- **in natura** (136,40 €/mese nel cedolino 01): tassabile a IRPEF ma **non incassato** — fuori dalle competenze e dalla base IVS (entra però nella base TFR);
-- **incassato in busta** (es. indennità autovettura 261,30 €/mese nel cedolino 03, voce Z.000463): entra **in competenze, base IVS e IRPEF** come lo stipendio.
+- **fringe benefit in natura** (136,40 €/mese nel cedolino 01): beneficio in specie (art. 51), tassabile a IRPEF ma **non incassato** — fuori dalle competenze e dalla base IVS (entra però nella base TFR);
+- **indennità personale in denaro** (es. autovettura 261,30 €/mese nel cedolino 03, voce Z.000463): NON è un fringe benefit — è un emolumento/compensazione monetaria (tipicamente opt-out dell’auto aziendale), retribuzione piena: entra **in competenze, base IVS, IRPEF e base TFR** come lo stipendio.
 
 Minimi CCNL del triennio già pronti: 4.660 (2026) · 4.920 (2027) · 5.140 (2028) (aumenti art. 6 TU già inclusi, rinnovo 5/11/2025).
 
@@ -62,7 +62,7 @@ Il modello si replica **al centesimo** anche sul cedolino di un secondo dirigent
   add.reg. 345,82 + add.com. 64,12 + acconto 36,43 + arrotond. 0,14 = **TOTALE TRATTENUTE 6.817,53**;
 - **NETTO 6.796,00** = 13.612,95 − 6.817,53 + 0,58 ✓; RAL 179.999,96 (base contratto 70.140,00 + superminimo individuale 109.859,96).
 
-Nel simulatore: supc=0, supi=7847.14, ggRet=26, ggFer=0, ggFest=1, fringe in natura 0, fringe incassato 261,30,
+Nel simulatore: supc=0, supi=7847.14, ggRet=26, ggFer=0, ggFest=1, fringe in natura 0, indennità in denaro 261,30,
 override IRPEF lorda 4.810,85, residui 345,82/64,12, acconto 36,43, arrotondamenti 0,14/0,58.
 
 ## Struttura dell'Excel (5 fogli)

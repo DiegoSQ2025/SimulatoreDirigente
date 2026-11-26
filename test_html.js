@@ -90,7 +90,7 @@ set('irpOv', '4810.85'); set('regRes', '345.82'); set('comRes', '64.12');
 set('acconto', '36.43'); set('arrotT', '0.14'); set('arrotN', '0.58');
 check('ced.03: retribuzione 26 gg 494,50538', rowValue('mensile', 'Retribuzione ('), 12857.14);
 check('ced.03: festivita non goduta 494,51', val('mensile', 'Festività/permessi'), 494.51);
-check('ced.03: indennità autovettura incassata', val('mensile', 'Indennità fringe incassata'), 261.30);
+check('ced.03: indennità autovettura in denaro', val('mensile', 'Indennità personale in denaro'), 261.30);
 check('ced.03: TOTALE COMPETENZE 13.612,95', rowValue('mensile', '= TOTALE COMPETENZE'), 13612.95);
 check('ced.03: IVS 1.251,03 su base arrotondata 13.613,00 (cedolino 1.251,04, scarto 0,01 in ZP9960)', val('mensile', 'Contributo IVS 9,19%'), 1251.03);
 check('ced.03: IVS agg. 1% 89,28', val('mensile', 'IVS agg. 1%'), 89.28);

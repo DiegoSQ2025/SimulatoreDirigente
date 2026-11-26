@@ -154,9 +154,12 @@ lines = [
     ("- Fondo formazione Mario Negri: 10,83 \u20ac/mese dirigente + 24,17 azienda (valori cedolino; il rinnovo 2026", None),
     ("  potrebbe averli aggiornati: verifica il fondo).", None),
     ("- TFR: art. 2120 c.c. con devoluzione ai fondi (art. 43 TU). NON e' trattenuta: non riduce il netto.", None),
-    ("- FRINGE: due tipologie. In natura (es. 136,40 del ced.01): tassabile, NON incassato, fuori dai", None),
-    ("  competenze e dalla base IVS ma dentro la base TFR. INCASSATO in busta (es. indennita'", None),
-    ("  autovettura 261,30 del ced.03): entra in competenze, IVS e IRPEF come lo stipendio.", None),
+    ("- FRINGE BENEFIT (art. 51 TUIR) vs INDENNITA' PERSONALE IN DENARO: due voci distinte e diverse.", None),
+    ("  Fringe in natura (es. 136,40 del ced.01): beneficio in specie, tassabile SOLO a IRPEF: non e'", None),
+    ("  incassato, fuori dalle competenze e dalla base IVS (dentro pero' la base TFR). Indennita'", None),
+    ("  personale in denaro (es. autovettura 261,30 del ced.03, voce Z.000463): NON e' un fringe benefit", None),
+    ("  bensi' un emolumento/compensazione monetaria (spesso opt-out dell'auto aziendale): entra in", None),
+    ("  competenze, base IVS, IRPEF e base TFR come lo stipendio.", None),
     ("- ADDIZIONALI: menu REGIONE (21 enti MEF) e COMUNE (7.897 comuni, dati 2026); modellate aliquote uniche e", None),
     ("  a scaglioni, soglie di esenzione, regole speciali Lazio/Umbria/FVG/VdA/Trento/Bolzano.", None),
     ("", None),
@@ -173,7 +176,7 @@ lines = [
     ("SECONDO CEDOLINO DI VERIFICA (dirigente 03, stesso datore, superminimo molto piu' alto)", "h"),
     ("- Intestazione: MINIMO 4.660 + AUM.RETR. 500 + SMM 2016 350 + S.MINIMO 6.489,99714 + Ad Pers. 857,14286", None),
     ("  = RME 12.857,14 = 494,50538 x 26 gg (niente SUP.CONTR: poni supc=0 e supi=7.847,14).", None),
-    ("- Voci: 26 GG retribuiti + 1 festivita' non goduta (494,51) + indennita' autovettura INCASSATA 261,30", None),
+    ("- Voci: 26 GG retribuiti + 1 festivita' non goduta (494,51) + indennita' personale in denaro autovettura 261,30", None),
     ("  = TOTALE COMPETENZE 13.612,95.", None),
     ("- Base IVS 13.613,00 = competenze arrotondate all'EURO (13.612,95): conferma ARROTONDAMENTO, non", None),
     ("  troncamento. IVS 1.251,04 (13.613 x 9,19%) + agg 89,28 (8.928 x 1%); Negri 98,71; FASDAC 71,59;", None),
@@ -447,7 +450,7 @@ r = put(ws, r, "Giorni festivita'/permessi", 1, "Z01138", None, True)
 c_ggfest = r - 1
 r = put(ws, r, "Fringe benefit mensile (in natura, tassabile)", 136.4, "voce in natura: tassabile, non e' flusso di cassa", MONEY, True)
 c_fringe = r - 1
-r = put(ws, r, "Fringe benefit INCASSATO (mensile, es. autovettura)", 0.0, "voce in CASSA come il cedolino 03 (Z.000463: 261,30): entra in competenze, IVS e IRPEF", MONEY, True)
+r = put(ws, r, "Indennita' personale in denaro (mensile, es. autovettura)", 0.0, "emolumento in DENARO, NON fringe ben. art. 51: come Z.000463 ced.03 (261,30) = compensazione monetaria/opt-out auto; entra in competenze, IVS, IRPEF e base TFR", MONEY, True)
 c_fringeCash = r - 1
 
 r += 1
@@ -478,7 +481,7 @@ r = put(ws, r, "Ferie godute (gg x retr. giornaliera)", f"=ROUND($B${c_ggfer}*$B
 c_fer = r - 1
 r = put(ws, r, "Festivita'/permessi (gg x retr. giornaliera)", f"=ROUND($B${c_ggfest}*$B${c_giorn},2)", "Z01138", MONEY)
 c_fest = r - 1
-r = put(ws, r, "Indennita' fringe incassata (es. autovettura)", f"=$B${c_fringeCash}", "ced.03: 261,30 in cassa (Z.000463)", MONEY)
+r = put(ws, r, "Indennita' personale in denaro (es. autovettura)", f"=$B${c_fringeCash}", "ced.03: 261,30 in cassa (Z.000463): retribuzione piena, non fringe ben.", MONEY)
 c_frcc = r - 1
 r = put(ws, r, "TOTALE COMPETENZE", f"=B{c_ret}+B{c_fer}+B{c_fest}+B{c_fringeCash}", "cedolino 8.291,38; cedolino 03: 13.612,95", MONEY, False, True)
 c_comp = r - 1
@@ -531,7 +534,7 @@ c_pasta = r - 1
 r = put(ws, r, "Fondo formazione annuo", f"={P['MNF_DIP']}*12", "quota dirigente x 12 mesi", MONEY)
 r = put(ws, r, "RLD — reddito di riferimento: RAL − IVS − agg. − Negri", f"=$B${c_RAL}-$B${c_ivsa}-$B${c_agga}-$B${c_negria}", "base detrazioni e deduzione Negri", MONEY, False, True)
 c_rld = r - 1
-r = put(ws, r, "Imponibile IRPEF annuo (RLD + fringe x 12 + fringe incassata x 12)", f"=$B${c_rld}+$B${c_fringe}*12+$B${c_fringeCash}*12", "fringe in natura e incassata: entrambe tassabili per i dirigenti", MONEY, False, True)
+r = put(ws, r, "Imponibile IRPEF annuo (RLD + fringe natura x 12 + indennita' denaro x 12)", f"=$B${c_rld}+$B${c_fringe}*12+$B${c_fringeCash}*12", "fringe in natura e indennita' in denaro: entrambe tassabili per i dirigenti", MONEY, False, True)
 c_imp = r - 1
 r = put(ws, r, "IRPEF lorda annua", f"=IF($B${c_imp}<={P['S1']},$B${c_imp}*{P['A1']},{P['S1']}*{P['A1']}+IF($B${c_imp}<={P['S2']},($B${c_imp}-{P['S1']})*{P['A2']},({P['S2']}-{P['S1']})*{P['A2']}+($B${c_imp}-{P['S2']})*{P['A3']}))", "L. 199/2025: 23/33/43%", MONEY)
 c_irpla = r - 1

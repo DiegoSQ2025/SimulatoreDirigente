@@ -123,7 +123,7 @@ IN_LABELS = {
     "ggFer": "Giorni di ferie godute",
     "ggFest": "Giorni festivita'/permessi",
     "fringe": "Fringe benefit mensile",
-    "fringeCash": "Fringe benefit INCASSATO (mensile",
+    "fringeCash": "Indennita' personale in denaro (mensile",
     "ov": "IRPEF lorda del mese \u2014 override",
     "regRes": "Add. regionale del mese \u2014 residuo",
     "comRes": "Add. comunale del mese \u2014 residuo",

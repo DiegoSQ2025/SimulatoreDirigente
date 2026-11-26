@@ -94,7 +94,7 @@
    <div class="row2">
     <div><label for="ggFest">Giorni festività/permessi</label><input type="number" id="ggFest" value="1" min="0" max="26"></div>
     <div><label for="fringe">Fringe benefit mensile (in natura, €)</label><input type="number" id="fringe" value="136.4"></div>
-    <div><label for="fringeCash">Fringe benefit INCASSATO (€/mese, es. autovettura: entra in competenze, IVS e IRPEF)</label><input type="number" id="fringeCash" value="0"></div>
+    <div><label for="fringeCash">Indennità personale in denaro (€/mese, es. autovettura opt-out: NON è fringe ben. art. 51 — entra in competenze, IVS, IRPEF e base TFR)</label><input type="number" id="fringeCash" value="0"></div>
    </div>
    <div class="row2">
     <div><label for="regione">Regione (addizionale IRPEF)</label><select id="regione"></select></div>
@@ -120,7 +120,7 @@
    </div>
    <p class="hint">Default caricati dal cedolino Zucchetti di controllo (liv. 5, 25 gg + 1 ferie + 1 festività):
    congiunta con i residui di addizionali 2025 replica il netto 4.184,00 €. Azzera gli override per una
-   mensilità "pulita". Il fringe benefit in natura è tassabile ma non è flusso di cassa; quello INCASSATO (es. autovettura del cedolino 03) entra invece in competenze, IVS e IRPEF.</p>
+   mensilità "pulita". Il fringe benefit in natura (art. 51) è tassabile ma non è flusso di cassa né contributivo; l’indennità personale in denaro (es. autovettura del cedolino 03) è invece retribuzione piena: competenze, IVS, IRPEF e base TFR.</p>
   </div>
 
   <div>
@@ -322,7 +322,7 @@ function run(){
  row(tM,["Retribuzione ("+ggRet+" gg \u00d7 "+r.giorn.toFixed(5)+")",eur(r2(ggRet*r.giorn))]);
  row(tM,["Ferie godute ("+ggFer+" gg)",eur(r2(ggFer*r.giorn))]);
  row(tM,["Festività/permessi ("+ggFest+" gg)",eur(r2(ggFest*r.giorn))]);
- row(tM,["Indennità fringe incassata (es. autovettura)",eur(r2(fringeCash))]);
+ row(tM,["Indennità personale in denaro (es. autovettura)",eur(r2(fringeCash))]);
  rowTot(tM,["= TOTALE COMPETENZE",eur(r.comp)]);
  row(tM,["− Contributo IVS 9,19%",eur(-r.ivsM)]);
  row(tM,["− Contributo IVS agg. 1% (sopra 56.224/12)",eur(-r.aggM)]);
@@ -353,7 +353,7 @@ function run(){
  row(tA,["− A. Pastore annuo (464,81 €; detraibile 19% max 530 a conguaglio)",eur(PAR.apAnn)]);
  row(tA,["− Fondo formazione Mario Negri annuo",eur(r.formM*12)]);
  row(tA,["= RLD — reddito di riferimento (RAL − IVS − agg. − Negri)",eur(r.rld),'tot']);
- row(tA,["= Imponibile IRPEF annuo (RLD + fringe × 12 + fringe incassata × 12)",eur(r.imp),'tot']);
+ row(tA,["= Imponibile IRPEF annuo (RLD + fringe natura × 12 + indennità denaro × 12)",eur(r.imp),'tot']);
  row(tA,["IRPEF lorda annua — L. 199/2025 (23% / 33% / 43%)",eur(r.irpl)]);
  row(tA,["− Detrazione lavoro dip. art. 13 TUIR (sul RLD)",eur(r.dede)]);
  row(tA,["= IRPEF NETTA annua",eur(r.irpn),'tot']);
