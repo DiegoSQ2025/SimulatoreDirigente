@@ -122,12 +122,17 @@ lines = [
     ("1. Foglio 'Parametri': TUTTE le variabili (IVS, fondi Negri/FASDAC/Pastore, IRPEF, minimi CCNL 2026-2028).", None),
     ("2. Scegli REGIONE e COMUNE (menu a discesa, dati MEF 2026): addizionali calcolate in automatico.", None),
     ("3. Foglio 'Simulazione': retribuzione in 4 voci, giorni del mese, prospetto annuo e 'cedolino del mese'.", None),
+    ("   N.B. SUP.CONTR = superminimo CONTRATTUALE nazionale (Allegato C TU: parte tabellare, uguale", None),
+    ("   per tutti i dirigenti). S.MINIMO = superminimo INDIVIDUALE negoziato col singolo dirigente:", None),
+    ("   e' la variabile personale (cella gialla, anche a 0 se non previsto dalla propria azienda).", None),
+    ("   RAL di fatto = RAL base di contratto (minimo + SUP.CONTR + SMM 2016) x 14 + S.MINIMO x 14 (+ scatti).", None),
     ("4. Foglio 'Confronto anni': minimi CCNL 2026/2027/2028 con gli stessi parametri.", None),
     ("", None),
     ("REGOLE DIRIGENTE (TU CCNL Dirigenti + cedolino Zucchetti di riferimento)", "h"),
     ("- Retribuzione mensile in 4 voci: MINIMO CCNL (4.660,00 dal 1/1/2026), superminimo contrattuale", None),
     ("  (SUP.CONTR), SMM 2016 (350,00) e superminimo individuale (S.MINIMO): 4.660+1.317,48+350+1.656,81 = 7.984,29.", None),
-    ("- Retribuzione GIORNALIERA = mensile / 26 (art. 4 c. 6 TU): nel cedolino 7.984,29/26 = 307,08791 \u20ac.", None),
+    ("- 26 son le GIORNATE STANDARD del mese dirigente (art. 4 c. 6 TU): retribuzione giornaliera = mensile/26;", None),
+    ("  nel cedolino 7.984,29/26 = 307,08791 \u20ac. Ferie e festivita' sostituiscono le giornate una a una.", None),
     ("- 14 mensilita' (art. 8 TU): 13\u00aa a dicembre, 14\u00aa a giugno, retribuzione di fatto.", None),
     ("- Scatti di anzianita' abrogati dal 1/7/2004: resta solo il +258,22 dei premi pre-2004 (art. 9 TU).", None),
     ("- IVS dipendente: 9,19% sull'imponibile + 1% sulla quota annua sopra 56.224 \u20ac, massimale 122.295 \u20ac.", None),
@@ -401,11 +406,11 @@ dv_anno = DataValidation(type="list", formula1='"2026,2027,2028"', allow_blank=F
 ws.add_data_validation(dv_anno); dv_anno.add(ws.cell(row=cell_anno, column=2))
 r = put(ws, r, "MINIMO CCNL mensile", f"=IFERROR(VLOOKUP(TEXT($B${cell_anno},\"0\"),{P['TBL']},2,0),VLOOKUP($B${cell_anno},{P['TBL']},2,0))", "dal foglio Parametri", MONEY)
 c_minimo = r - 1
-r = put(ws, r, "SUP.CONTR \u2014 superminimo contrattuale (mensile)", 1317.48, "Allegato C TU / valore cedolino", MONEY, True)
+r = put(ws, r, "SUP.CONTR \u2014 superminimo CONTRATTUALE nazionale (mensile)", 1317.48, "Allegato C TU: parte tabellare, uguale per tutti i dirigenti (cedolino 1.317,48)", MONEY, True)
 c_supc = r - 1
-r = put(ws, r, "SMM 2016 (mensile)", 350.0, "SUPERMM 2016 nel cedolino", MONEY, True)
+r = put(ws, r, "SMM 2016 (mensile)", 350.0, "superminimo transitorio 2016, elemento nazionale (cedolino 350)", MONEY, True)
 c_smm = r - 1
-r = put(ws, r, "S.MINIMO \u2014 superminimo individuale (mensile)", 1656.80572, "valore esatto cedolino (display 1.656,81)", MONEY, True)
+r = put(ws, r, "S.MINIMO \u2014 superminimo INDIVIDUALE personale (mensile)", 1656.80572, "variabile personale: negoziata azienda+dirigente, INSERIRE il proprio (cedolino 1.656,80572; anche 0)", MONEY, True)
 c_supi = r - 1
 r = put(ws, r, "Scatti pre-2004 (mensile)", 0.0, "art. 9 TU: abrogati dal 2004; qui 0 di default", MONEY, True)
 c_scatti = r - 1
@@ -416,7 +421,7 @@ c_giorn = r - 1
 
 r += 1
 r = section(ws, r, "GIORNI E VOCI DEL MESE", 3)
-r = put(ws, r, "Giorni retribuiti (Retribuzione)", 25, "cedolino: 25,00000 GG", None, True)
+r = put(ws, r, "Giorni retribuiti (26 GG = mese pieno)", 25, "mese dirigente: 26 GG standard (art. 4 c.6 TU); cedolino: 25,00000 +1 ferie +1 festivita'", None, True)
 c_ggret = r - 1
 r = put(ws, r, "Giorni di ferie godute", 1, "Z00250", None, True)
 c_ggfer = r - 1
@@ -447,13 +452,13 @@ r = section(ws, r, "CEDOLINO DEL MESE (mensilita' ordinaria o 13\u00aa/14\u00aa:
 r = put(ws, r, "VOCE", "Importo", None)
 voci_hdr = r - 1
 ws.cell(row=voci_hdr, column=1).font = Font(bold=True); ws.cell(row=voci_hdr, column=2).font = Font(bold=True)
-r = put(ws, r, "Retribuzione (gg x retr. giornaliera)", f"=ROUND($B${c_ggret}*$B${c_giorn},2)", "Z00001", MONEY, True)
+r = put(ws, r, "Retribuzione (gg x retr. giornaliera)", f"=ROUND($B${c_ggret}*$B${c_giorn},2)", "Z00001", MONEY)
 c_ret = r - 1
 r = put(ws, r, "Ferie godute (gg x retr. giornaliera)", f"=ROUND($B${c_ggfer}*$B${c_giorn},2)", "Z00250", MONEY)
 c_fer = r - 1
 r = put(ws, r, "Festivita'/permessi (gg x retr. giornaliera)", f"=ROUND($B${c_ggfest}*$B${c_giorn},2)", "Z01138", MONEY)
 c_fest = r - 1
-r = put(ws, r, "TOTALE COMPETENZE", f"=B{c_ret}+B{c_fer}+B{c_fest}", "cedolino: 8.291,38", MONEY, True)
+r = put(ws, r, "TOTALE COMPETENZE", f"=B{c_ret}+B{c_fer}+B{c_fest}", "cedolino: 8.291,38", MONEY, False, True)
 c_comp = r - 1
 r = put(ws, r, "\u2212 Contributo IVS 9,19%", f"=ROUND(FLOOR(B{c_comp},1)*{P['INPS']},2)", "Z00000: base gia' arrotondata all'euro dal gestionale (8.291,00)", MONEY)
 c_ivsm = r - 1
@@ -467,10 +472,10 @@ r = put(ws, r, "\u2212 A. Pastore quota dirigente", f"={P['AP_M']}", "464,81/12 
 c_pastm = r - 1
 r = put(ws, r, "\u2212 Fondo formazione Mario Negri", f"={P['MNF_DIP']}", "quota fissa 10,83", MONEY)
 c_formm = r - 1
-r = put(ws, r, "IRPEF lorda a debito del mese", f"=IF($B${c_irpov}>0,$B${c_irpov},0)", "F02010; override attivo se > 0, altrimenti annua/14", MONEY, True)
+r = put(ws, r, "IRPEF lorda a debito del mese", f"=IF($B${c_irpov}>0,$B${c_irpov},0)", "F02010; override attivo se > 0, altrimenti annua/14 (INPUT nell'apposita riga sopra)", MONEY)
 c_irpm = r - 1
 ws.cell(row=c_irpm, column=2).value = None  # formula definitiva assegnata dopo (dipende da IRPEF annua)
-r = put(ws, r, "\u2212 Addizionale regionale del mese", f"=IF($B${c_regres}>0,$B${c_regres},0)", "F09110: residuo o rateizzata", MONEY, True)
+r = put(ws, r, "\u2212 Addizionale regionale del mese", f"=IF($B${c_regres}>0,$B${c_regres},0)", "F09110: residuo o rateizzata (INPUT nell'apposita riga sopra)", MONEY)
 c_regm = r - 1
 ws.cell(row=c_regm, column=2).value = None
 r = put(ws, r, "\u2212 Addizionale comunale del mese", "=0", "F09130: residuo o rateizzata", MONEY)
@@ -479,15 +484,17 @@ ws.cell(row=c_comm, column=2).value = None
 r = put(ws, r, "\u2212 Acconto addizionali extra", f"=$B${c_acconto}", "F09140: trattenuta additiva del mese", MONEY)
 c_accm = r - 1
 r = put(ws, r, "\u2212 Arrotondamento trattenute", f"=$B${c_arrotT}", "ZP9960", MONEY)
-r = put(ws, r, "TOTALE TRATTENUTE", f"=B{c_ivsm}+B{c_aggm}+B{c_negrim}+B{c_fasdaqm}+B{c_pastm}+B{c_formm}+B{c_irpm}+B{c_regm}+B{c_comm}+B{c_accm}+$B${c_arrotT}", "cedolino: 4.107,91", MONEY, True)
+r = put(ws, r, "TOTALE TRATTENUTE", f"=B{c_ivsm}+B{c_aggm}+B{c_negrim}+B{c_fasdaqm}+B{c_pastm}+B{c_formm}+B{c_irpm}+B{c_regm}+B{c_comm}+B{c_accm}+$B${c_arrotT}", "cedolino: 4.107,91", MONEY, False, True)
 c_tratt = r - 1
-r = put(ws, r, "NETTO DEL MESE", f"=B{c_comp}-B{c_tratt}+B{c_arrotN}", "cedolino: 4.184,00 (8.291,38 \u2212 4.107,91 + 0,53)", MONEY, True)
+r = put(ws, r, "NETTO DEL MESE", f"=B{c_comp}-B{c_tratt}+B{c_arrotN}", "cedolino: 4.184,00 (8.291,38 \u2212 4.107,91 + 0,53)", MONEY, False, True)
 c_nettoM = r - 1
 r = put(ws, r, "(Fringe benefit del mese: in natura, non in cassa)", f"=$B${c_fringe}", "informativo: tassabile, non tocca il netto", MONEY)
 
 r += 1
 r = section(ws, r, "CALCOLO ANNUO (modello a scaglioni \u2014 base IRPEF del gestionale non ricostruita)", 3)
-r = put(ws, r, "RAL \u2014 retribuzione annua lorda (RME x 14)", f"=$B${c_rme}*{P['MENS']}", "", MONEY, True)
+r = put(ws, r, "Retr. base di contratto annua CCNL (minimo + SUP.CONTR + SMM 2016, x 14)", f"=(B{c_minimo}+B{c_supc}+B{c_smm})*{P['MENS']}", "quanto previsto dal puro contratto nazionale", MONEY, False, True)
+r = put(ws, r, "Superminimo individuale annuo (S.MINIMO x 14)", f"=B{c_supi}*{P['MENS']}", "la variabile personale (puo' essere 0)", MONEY)
+r = put(ws, r, "RAL \u2014 retribuzione annua effettiva (base di contratto + S.MINIMO + scatti)", f"=$B${c_rme}*{P['MENS']}", "cedolino: 88.584,72 + 23.195,28 = 111.780,00", MONEY, False, True)
 c_RAL = r - 1
 r = put(ws, r, "IVS 9,19% annua (fino al massimale)", f"=MIN($B${c_RAL},{P['MAXC']})*{P['INPS']}", "", MONEY)
 c_ivsa = r - 1
@@ -500,9 +507,9 @@ c_fasdca = r - 1
 r = put(ws, r, "A. Pastore annuo", f"={P['AP_ANN']}", "detrazione 19% solo a conguaglio (input oneri)", MONEY)
 c_pasta = r - 1
 r = put(ws, r, "Fondo formazione annuo", f"={P['MNF_DIP']}*12", "quota dirigente x 12 mesi", MONEY)
-r = put(ws, r, "RLD — reddito di riferimento: RAL − IVS − agg. − Negri", f"=$B${c_RAL}-$B${c_ivsa}-$B${c_agga}-$B${c_negria}", "base detrazioni e deduzione Negri", MONEY, True)
+r = put(ws, r, "RLD — reddito di riferimento: RAL − IVS − agg. − Negri", f"=$B${c_RAL}-$B${c_ivsa}-$B${c_agga}-$B${c_negria}", "base detrazioni e deduzione Negri", MONEY, False, True)
 c_rld = r - 1
-r = put(ws, r, "Imponibile IRPEF annuo (RLD + fringe x 12)", f"=$B${c_rld}+$B${c_fringe}*12", "fringe in natura: tassabile per i dirigenti", MONEY, True)
+r = put(ws, r, "Imponibile IRPEF annuo (RLD + fringe x 12)", f"=$B${c_rld}+$B${c_fringe}*12", "fringe in natura: tassabile per i dirigenti", MONEY, False, True)
 c_imp = r - 1
 r = put(ws, r, "IRPEF lorda annua", f"=IF($B${c_imp}<={P['S1']},$B${c_imp}*{P['A1']},{P['S1']}*{P['A1']}+IF($B${c_imp}<={P['S2']},($B${c_imp}-{P['S1']})*{P['A2']},({P['S2']}-{P['S1']})*{P['A2']}+($B${c_imp}-{P['S2']})*{P['A3']}))", "L. 199/2025: 23/33/43%", MONEY)
 c_irpla = r - 1
@@ -513,7 +520,7 @@ r = put(ws, r, "Detrazione lavoro dipendente (art. 13 TUIR)", f"=IF($B${c_rld}<=
 c_ded = r - 1
 r = put(ws, r, "Detrazione effettiva (capienza imposta)", f"=MIN($B${c_ded},$B${c_irpla})", "", MONEY)
 c_dede = r - 1
-r = put(ws, r, "IRPEF NETTA annua", f"=MAX(0,$B${c_irpla}-$B${c_dede}-$B${c_dedon})", "", MONEY, True)
+r = put(ws, r, "IRPEF NETTA annua", f"=MAX(0,$B${c_irpla}-$B${c_dede}-$B${c_dedon})", "", MONEY, False, True)
 c_irpna = r - 1
 r = put(ws, r, "Addizionale regionale annua", reg_add_xls(f"$B${c_imp}"), "regola MEF della regione scelta", MONEY)
 c_rega = r - 1
@@ -523,7 +530,7 @@ c_coma = r - 1
 ws.cell(row=c_comm, column=2).value = f"=IF($B${c_comres}>0,$B${c_comres},ROUND($B${c_coma}/12,2))"
 r = put(ws, r, "Totale trattenute annue", f"=$B${c_ivsa}+$B${c_agga}+$B${c_negria}+$B${c_fasdca}+$B${c_pasta}+$B${c_formm}*12+$B${c_irpna}+$B${c_rega}+$B${c_coma}", "senza frange e arrotondamenti di cassa", MONEY)
 c_tta = r - 1
-r = put(ws, r, "NETTO ANNUO in busta", f"=$B${c_RAL}-$B${c_tta}", "", MONEY, True)
+r = put(ws, r, "NETTO ANNUO in busta", f"=$B${c_RAL}-$B${c_tta}", "", MONEY, False, True)
 c_nettoa = r - 1
 r = put(ws, r, "Netto medio per mensilita' (annuo / 14)", f"=$B${c_nettoa}/{P['MENS']}", "", MONEY)
 

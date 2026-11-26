@@ -21,6 +21,13 @@ Tool di simulazione **dal lordo al netto** per **dirigenti del CCNL Terziario, D
 | IRPEF 2026 | scaglioni 23% / 33% / 43% (L. 199/2025); detrazione art. 13 sul RLD (0 oltre 75.000 €); **IRPEF del mese = IRPEF annua ÷ 14** | — |
 | Addizionali | elenchi generali MEF 2026: 21 enti regionali + 7.897 comuni; **rate mensile = annua ÷ 12** | Lazio 1,73/3,33% ; Roma 0,9% ≤14.000 |
 
+**SUP.CONTR vs S.MINIMO — differenza chiave**
+
+- **SUP.CONTR (superminimo contrattuale nazionale)**: elemento *tabellare* del TU/allegato C — uguale per tutti i dirigenti, 1.317,48 €/mese nel cedolino. Non è negoziabile.
+- **S.MINIMO (superminimo individuale)**: il superminimo *personale* negoziato tra azienda e singolo dirigente → **la variabile da inserire manualmente** (1.656,81 €/mese nel cedolino; può essere 0 se la tua azienda non ne prevede).
+
+La pagina mostra ora entrambe le RAL separatamente: **RAL base di contratto** = (minimo + SUP.CONTR + SMM 2016) × 14 = 88.584,72 € e **superminimo individuale** 1.656,81 × 14 = 23.195,28 € → RAL di fatto 111.780,00 €. Le giornate standard del mese dirigente sono **26** (art. 4 c.6 TU: ogni giornata vale RME ÷ 26; ferie e festività le sostituiscono una a una).
+
 Minimi CCNL del triennio già pronti: 4.660 (2026) · 4.920 (2027) · 5.140 (2028) (aumenti art. 6 TU già inclusi, rinnovo 5/11/2025).
 
 ## Riconciliazione con il cedolino Zucchetti di riferimento

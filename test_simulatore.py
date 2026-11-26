@@ -82,6 +82,8 @@ def py_calc(anno=2026, supc=1317.48, smm=350.0, supi=1656.80572, scatti=0.0,
     pastM = AP_M
     formM = MNF_DIP
     RAL = RME * MENS
+    ralBase = (minimo + supc + smm) * MENS
+    supiA = supi * MENS
     ivsA = min(RAL, MAXC) * INPS
     aggA = max(0.0, RAL - AGG_SOG) * AGG_ALQ
     negriA = MN_BASE * MN_D
@@ -103,16 +105,17 @@ def py_calc(anno=2026, supc=1317.48, smm=350.0, supi=1656.80572, scatti=0.0,
     return {"RME": RME, "giorn": giorn, "comp": comp, "ivsM": ivsM, "aggM": aggM,
             "negriM": negriM, "fasdacM": fasdacM, "pastM": pastM, "formM": formM,
             "irpm": irpm, "regM": regM, "comM": comM, "tratt": tratt, "nettoM": nettoM,
-            "RAL": RAL, "ivsA": ivsA, "aggA": aggA, "negriA": negriA, "fasdacA": fasdacA,
+            "RAL": RAL, "ralBase": ralBase, "supiA": supiA,
+            "ivsA": ivsA, "aggA": aggA, "negriA": negriA, "fasdacA": fasdacA,
             "rld": rld, "imp": imp, "irpl": irpl, "ded": ded, "dede": dede, "irpn": irpn,
             "regA": regA, "comA": comA, "nettoA": nettoA, "nettoM14": nettoA / MENS}
 
 
 IN_LABELS = {
     "anno": "Anno di paga",
-    "supc": "SUP.CONTR \u2014 superminimo contrattuale",
+    "supc": "SUP.CONTR \u2014 superminimo CONTRATTUALE nazionale",
     "smm": "SMM 2016 (mensile)",
-    "supi": "S.MINIMO \u2014 superminimo individuale",
+    "supi": "S.MINIMO \u2014 superminimo INDIVIDUALE personale",
     "scatti": "Scatti pre-2004 (mensile)",
     "ggRet": "Giorni retribuiti",
     "ggFer": "Giorni di ferie godute",
@@ -147,7 +150,9 @@ OUT_LABELS = {
     "comM": "\u2212 Addizionale comunale del mese",
     "tratt": "TOTALE TRATTENUTE",
     "nettoM": "NETTO DEL MESE",
-    "RAL": "RAL \u2014 retribuzione annua lorda",
+    "RAL": "RAL \u2014 retribuzione annua effettiva",
+    "ralBase": "Retr. base di contratto annua CCNL",
+    "supiA": "Superminimo individuale annuo",
     "ivsA": "IVS 9,19% annua",
     "aggA": "IVS agg. 1% annua",
     "negriA": "Fondo Mario Negri 2% annuo",
@@ -304,6 +309,8 @@ ZUCCHETTI = [
     ("Zucchetti: TOTALE TRATTENUTE 4.107,91", "tratt", 4107.91),
     ("Zucchetti: NETTO DEL MESE 4.184,00", "nettoM", 4184.00),
     ("Zucchetti: RAL 111.780,00", "RAL", 111780.00),
+    ("Zucchetti: RAL base di contratto 88.584,72", "ralBase", 88584.72),
+    ("Zucchetti: superminimo individuale annuo 23.195,28", "supiA", 23195.28),
     ("Zucchetti: Detrazione art. 13 = 0 (RLD > 75k)", "ded", 0.0),
     ("Zucchetti: addizionale regionale annua Lazio", "regA", 3136.76),
     ("Zucchetti: addizionale comunale annua Roma", "comA", 912.64),

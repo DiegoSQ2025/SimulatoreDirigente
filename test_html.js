@@ -41,6 +41,8 @@ check('numero enti regionali nel menu', get('regione').options.length, 21, 0);
 check('default regione', get('regione').value, 'Lazio');
 check('default comune', get('comune').value, 'Roma');
 check('righe confronto minimi CCNL (header + 3 anni)', get('confronto').rows.length - 1, 3, 0);
+check('label SUP.CONTR chiara (nazionale)', /nazionale/i.test(get('supc').labels[0].textContent) ? 1 : 0, 1, 0);
+check('label S.MINIMO chiara (personale)', /personale/i.test(get('supi').labels[0].textContent) ? 1 : 0, 1, 0);
 
 /* scenario 1: preset identico al cedolino Zucchetti (dirigente Liv. 5, GG 25+1+1, Lazio/Roma, override conguaglio) */
 check('mensile: retribuzione 25 gg', rowValue('mensile', 'Retribuzione ('), 7677.20);
@@ -62,7 +64,9 @@ check('kpi: netto del mese', kpi('kpiNettoM'), 4184.00);
 check('kpi: totale trattenute', kpi('kpiTratt'), 4107.91);
 check('kpi: RAL 14 mensilita', kpi('kpiRAL'), 111780.00);
 check('annuale: RME', rowValue('annuale', 'RME \u2014 retribuzione mensile'), 7984.29);
-check('annuale: RAL', rowValue('annuale', 'RAL \u2014 retribuzione annua lorda'), 111780.00);
+check('annuale: retr. base di contratto CCNL', rowValue('annuale', 'Retr. base di contratto'), 88584.72);
+check('annuale: superminimo individuale annuo', rowValue('annuale', 'Superminimo individuale'), 23195.28);
+check('annuale: RAL (base contratto + S.MINIMO + scatti)', rowValue('annuale', 'RAL \u2014 retribuzione annua effettiva'), 111780.00);
 check('annuale: IVS annua', rowValue('annuale', 'IVS 9,19% annua'), 10272.58);
 check('annuale: IVS agg. annua', rowValue('annuale', 'IVS agg. 1% annua'), 555.56);
 check('annuale: Negri annuo', rowValue('annuale', 'Fondo Mario Negri 2% annuo'), 1184.49);

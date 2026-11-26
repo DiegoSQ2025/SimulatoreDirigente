@@ -80,15 +80,15 @@
    <label for="anno">Anno di paga (minimo CCNL)</label>
    <select id="anno"><option selected>2026</option><option>2027</option><option>2028</option></select>
    <div class="row2">
-    <div><label for="supc">Sup.Contr — superminimo contrattuale (€/mese)</label><input type="number" id="supc" value="1317.48"></div>
+    <div><label for="supc">SUP.CONTR — superminimo contrattuale NAZIONALE (€/mese: uguale per tutti i dirigenti, Allegato C TU)</label><input type="number" id="supc" value="1317.48"></div>
     <div><label for="smm">SMM 2016 (€/mese)</label><input type="number" id="smm" value="350"></div>
    </div>
    <div class="row2">
-    <div><label for="supi">S.MINIMO — superminimo individuale (€/mese)</label><input type="number" id="supi" value="1656.80572"></div>
+    <div><label for="supi">S.MINIMO — superminimo individuale PERSONALE (€/mese: la tua variabile, negoziata col datore)</label><input type="number" id="supi" value="1656.80572"></div>
     <div><label for="scatti">Scatti pre-2004 (€/mese)</label><input type="number" id="scatti" value="0" min="0"></div>
    </div>
    <div class="row2">
-    <div><label for="ggRet">Giorni retribuiti (max 26)</label><input type="number" id="ggRet" value="25" min="0" max="26"></div>
+    <div><label for="ggRet">Giorni retribuiti (26 GG = mese pieno, art. 4 c.6 TU)</label><input type="number" id="ggRet" value="25" min="0" max="26"></div>
     <div><label for="ggFer">Giorni ferie</label><input type="number" id="ggFer" value="1" min="0" max="26"></div>
    </div>
    <div class="row2">
@@ -335,11 +335,14 @@ function run(){
  rowTot(tM,["= TOTALE TRATTENUTE",eur(tratt)]);
  rowTot(tM,["= NETTO DEL MESE",eur(nettoM)]);
  rowInfo(tM,["(Fringe benefit del mese: in natura, tassabile, non in cassa)",eur(fringe)]);
+ rowInfo(tM,["Mese dirigente: 26 GG standard (art. 4 c.6 TU: ogni giornata = RME ÷ 26); ferie e festività le sostituiscono",""]);
 
  const tA=document.getElementById('annuale'); tA.innerHTML="";
  row(tA,["Voce","Importo annuo"]);
  row(tA,["RME — retribuzione mensile effettiva (minimo+sup.contr.+SMM 2016+S.MINIMO+scatti 2004)",eur(r.RME)]);
- rowTot(tA,["RAL — retribuzione annua lorda (RME × 14 mensilità, art. 8 TU)",eur(r.RAL),'tot']);
+ row(tA,["Retr. base di contratto annua CCNL (minimo + SUP.CONTR + SMM 2016) × 14",eur((minimo+supc+smm)*PAR.mens)]);
+ row(tA,["Superminimo individuale — S.MINIMO × 14 (la tua variabile personale)",eur(supi*PAR.mens)]);
+ rowTot(tA,["RAL — retribuzione annua effettiva (base di contratto + S.MINIMO + scatti)",eur(r.RAL),'tot']);
  row(tA,["− IVS 9,19% annua (fino al massimale 122.295 €)",eur(r.ivsA)]);
  row(tA,["− IVS agg. 1% annua (sopra 56.224 €)",eur(r.aggA)]);
  row(tA,["− Fondo Mario Negri 2% annuo (base convenzionale 59.224,54 €; deducibile)",eur(r.negriA)]);

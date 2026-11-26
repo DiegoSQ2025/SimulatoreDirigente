@@ -38,7 +38,9 @@ Struttura: `TAB3` (minimi 2026/2027/2028), `PAR` (inps .0919, aggSog 56224, maxC
 ACCESSIBILITÀ: ogni input/select deve avere una label (`for`/`id`) o `aria-label` (usato per `#regPct`/`#comPct`).
 
 ## Regole dirigente vigenti (vigenza 2026 — riconciliate al centesimo con cedolino Zucchetti Dirigente Terziario Liv. 5, Lazio/Roma, GG 25+1+1)
-- **Retribuzione in 4 voci** (celle Parametri B2-B5): MINIMO tabellare 2026 **4.660,00** + SUPERMINIMO CONTRATTUALE **1.317,48** + SMM 2016 **350,00** + SUPERMINIMO INDIVIDUALE (default 1.656,80572; display 1.656,81) → **RME 7.984,29**. Retribuzione giornaliera = RME/26 (art. 4 c.6 TU: 307,08791).
+- **Retribuzione in 4 voci** (celle Parametri B2-B5): MINIMO tabellare 2026 **4.660,00** + **SUP.CONTR = superminimo CONTRATTUALE nazionale** (Allegato C TU: elemento tabellare, uguale per tutti i dirigenti; 1.317,48) + **SMM 2016 350,00** (transitorio nazionale) + **S.MINIMO = superminimo INDIVIDUALE personale** (negoziabile azienda+dirigente, LA VARIABILE da inserire; default cedolino 1.656,80572, display 1.656,81; anche 0) → **RME 7.984,29**.
+- **26 GIORNATE standard al mese** (art. 4 c.6 TU): retribuzione giornaliera = RME/26 (307,08791); ferie e festività sostituiscono le giornate una a una.
+- **RAL in due righe distinte** (blocco annuale, HTML ed Excel): `Retr. base di contratto annua CCNL` = (minimo+SUP.CONTR+SMM 2016)×14 (88.584,72 nel cedolino) e `Superminimo individuale annuo` = S.MINIMO×14 (23.195,28); `RAL — retribuzione annua effettiva` = somma (111.780,00). NON nascondere la scomposizione: è richiesta dall'utente.
 - **14 mensilità** (art. 8 TU): 12 + quattordicesima a giugno + tredicesima a dicembre. RAL = RME × 14.
 - **Scatti di anzianità abrogati dal 1/7/2004** (art. 9 TU): solo residui pre-2004 (+258,22 €/mese), input default 0.
 - **IVS INPS dirigente**: 9,19% + 1% aggregativa su (RAL − 56.224), massimale 122.295. NO CIGS/FIS/EST (dirigente non è dipendente di livello).
