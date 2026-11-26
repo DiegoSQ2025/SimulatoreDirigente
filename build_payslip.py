@@ -123,21 +123,23 @@ lines = [
     ("1. Foglio 'Parametri': TUTTE le variabili (IVS, fondi Negri/FASDAC/Pastore, IRPEF, minimi CCNL 2026-2028).", None),
     ("2. Scegli REGIONE e COMUNE (menu a discesa, dati MEF 2026): addizionali calcolate in automatico.", None),
     ("3. Foglio 'Simulazione': retribuzione in 4 voci, giorni del mese, prospetto annuo e 'cedolino del mese'.", None),
-    ("   N.B. SUP.CONTR = superminimo CONTRATTUALE nazionale (Allegato C TU: parte tabellare, uguale", None),
-    ("   per tutti i dirigenti; nel cedolino 03 e' ABSENTE: se l'azienda ti mostra AUM.RETR. o Ad Pers.,", None),
+    ("   N.B. SUP.CONTR = minimo CONTRATTUALE integrativo (voce di contratto, si somma al MINIMO art. 5;", None),
+    ("   uguale per tutti i dirigenti; nel cedolino 03 e' ABSENTE: se l'azienda ti mostra AUM.RETR. o Ad Pers.,", None),
     ("   poni SUP.CONTR a 0 e sommal QUI: sono componenti personali. S.MINIMO = superminimo INDIVIDUALE", None),
     ("   negoziato col singolo dirigente: e' la variabile personale (cella gialla, anche a 0).", None),
     ("   RAL di fatto = RAL base di contratto (minimo + SUP.CONTR + SMM 2016) x 14 + S.MINIMO x 14 (+ scatti).", None),
     ("4. Foglio 'Confronto anni': minimi CCNL 2026/2027/2028 con gli stessi parametri.", None),
     ("", None),
     ("REGOLE DIRIGENTE (TU CCNL Dirigenti + cedolino Zucchetti di riferimento)", "h"),
-    ("- Retribuzione mensile in 4 voci: MINIMO CCNL (4.660,00 dal 1/1/2026), superminimo contrattuale", None),
+    ("- Retribuzione mensile in 4 voci: MINIMO CCNL (4.660,00 dal 1/1/2026), minimo contrattuale", None),
     ("  (SUP.CONTR), SMM 2016 (350,00) e superminimo individuale (S.MINIMO): 4.660+1.317,48+350+1.656,81 = 7.984,29.", None),
     ("- 26 son le GIORNATE STANDARD del mese dirigente (art. 4 c. 6 TU): retribuzione giornaliera = mensile/26;", None),
     ("  nel cedolino 7.984,29/26 = 307,08791 \u20ac. Ferie e festivita' sostituiscono le giornate una a una.", None),
     ("- 14 mensilita' (art. 8 TU): 13\u00aa a dicembre, 14\u00aa a giugno, retribuzione di fatto.", None),
     ("- Scatti di anzianita' abrogati dal 1/7/2004: resta solo il +258,22 dei premi pre-2004 (art. 9 TU).", None),
-    ("- IVS dipendente: 9,19% sull'imponibile + 1% sulla quota annua sopra 56.224 \u20ac, massimale 122.295 \u20ac.", None),
+    ("- IVS: 9,19% sull'imponibile + 1% sulla quota annua sopra 56.224 \u20ac e fino al massimale 122.295 \u20ac", None),
+    ("  (Circ. INPS 6/2026: oltre il massimale NESSUNA contribuzione IVS, 1% compreso; nel mese l'1% resta", None),
+    ("  dovuto come da cedolino Zucchetti, che liquida mensilmente e conguaglia in anno).", None),
     ("  Per i dirigenti NON si applicano CIGS, FIS bilaterale e Fondo EST (assenti nel cedolino).", None),
     ("- IRPEF 2026: 23% fino a 28.000 \u20ac, 33% da 28.000 a 50.000 \u20ac, 43% oltre (L. 199/2025); detrazione", None),
     ("  art. 13 TUIR come per i dipendenti. L'imponibile dirigente e' sopra 75.000 \u20ac: nessuna somma", None),
@@ -427,9 +429,9 @@ dv_anno = DataValidation(type="list", formula1='"2026,2027,2028"', allow_blank=F
 ws.add_data_validation(dv_anno); dv_anno.add(ws.cell(row=cell_anno, column=2))
 r = put(ws, r, "MINIMO CCNL mensile", f"=IFERROR(VLOOKUP(TEXT($B${cell_anno},\"0\"),{P['TBL']},2,0),VLOOKUP($B${cell_anno},{P['TBL']},2,0))", "dal foglio Parametri", MONEY)
 c_minimo = r - 1
-r = put(ws, r, "SUP.CONTR \u2014 superminimo CONTRATTUALE nazionale (mensile)", 1317.48, "Allegato C TU (cedolino 1.317,48); nel cedolino 03 ASSENTE: se l'azienda mostra AUM.RETR./Ad Pers., metti 0 e sommali a S.MINIMO", MONEY, True)
+r = put(ws, r, "SUP.CONTR \u2014 minimo CONTRATTUALE integrativo (mensile)", 1317.48, "voce di contratto che si somma al MINIMO art. 5 (cedolino 1.317,48); nel cedolino 03 ASSENTE: se l'azienda mostra AUM.RETR./Ad Pers., metti 0 e sommali a S.MINIMO", MONEY, True)
 c_supc = r - 1
-r = put(ws, r, "SMM 2016 (mensile)", 350.0, "superminimo transitorio 2016, elemento nazionale (cedolino 350)", MONEY, True)
+r = put(ws, r, "SMM 2016 (mensile)", 350.0, "elemento contrattuale transitorio 2016 (cedolino 350)", MONEY, True)
 c_smm = r - 1
 r = put(ws, r, "S.MINIMO \u2014 superminimo INDIVIDUALE personale (mensile)", 1656.80572, "variabile personale: INSERIRE il proprio (ced.01 1.656,80572; ced.03 7.847,14 = AUM.RETR. 500 + S.MINIMO 6.489,99714 + Ad Pers. 857,14286; anche 0)", MONEY, True)
 c_supi = r - 1
@@ -523,7 +525,7 @@ r = put(ws, r, "RAL \u2014 retribuzione annua effettiva (base di contratto + S.M
 c_RAL = r - 1
 r = put(ws, r, "IVS 9,19% annua (fino al massimale)", f"=MIN($B${c_RAL},{P['MAXC']})*{P['INPS']}", "", MONEY)
 c_ivsa = r - 1
-r = put(ws, r, "IVS agg. 1% annua (sopra 56.224)", f"=MAX(0,$B${c_RAL}-{P['AGG_SOG']})*{P['AGG_ALQ']}", "", MONEY)
+r = put(ws, r, "IVS agg. 1% annua (sopra 56.224, entro massimale)", f"=MAX(0,MIN($B${c_RAL},{P['MAXC']})-{P['AGG_SOG']})*{P['AGG_ALQ']}", "Circ. INPS 6/2026: oltre il massimale 122.295 nessuna contribuzione IVS (1% compreso); il MESE resta come da cedolino (conguaglio annuo Zucchetti)", MONEY)
 c_agga = r - 1
 r = put(ws, r, "Fondo Mario Negri 2% annuo (base convenzionale)", f"={P['MN_BASE']}*{P['MN_D']}", "deducibile per intero (regime deroga)", MONEY)
 c_negria = r - 1
@@ -596,7 +598,7 @@ for i, (anno, minimo, _, _) in enumerate(MINIMI):
     ws.cell(row=row, column=3, value=f"=B{row}+{SUPC}+{SMM}+{SUPI}")
     ws.cell(row=row, column=4, value=f"=C{row}*{P['MENS']}")
     ws.cell(row=row, column=5, value=f"=MIN(D{row},{P['MAXC']})*{P['INPS']}")
-    ws.cell(row=row, column=6, value=f"=MAX(0,D{row}-{P['AGG_SOG']})*{P['AGG_ALQ']}")
+    ws.cell(row=row, column=6, value=f"=MAX(0,MIN(D{row},{P['MAXC']})-{P['AGG_SOG']})*{P['AGG_ALQ']}")
     ws.cell(row=row, column=7, value=f"={P['MN_BASE']}*{P['MN_D']}")
     ws.cell(row=row, column=8, value=f"={P['FD_BASE']}*{P['FD_D']}")
     ws.cell(row=row, column=9, value=f"=D{row}-E{row}-F{row}-G{row}")

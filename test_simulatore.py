@@ -87,7 +87,7 @@ def py_calc(anno=2026, supc=1317.48, smm=350.0, supi=1656.80572, scatti=0.0,
     ralBase = (minimo + supc + smm) * MENS
     supiA = supi * MENS
     ivsA = min(RAL, MAXC) * INPS
-    aggA = max(0.0, RAL - AGG_SOG) * AGG_ALQ
+    aggA = max(0.0, min(RAL, MAXC) - AGG_SOG) * AGG_ALQ   # Circ. INPS 6/2026: 1% solo fino al massimale 122.295
     negriA = MN_BASE * MN_D
     fasdacA = FD_BASE * FD_D
     rld = RAL - ivsA - aggA - negriA
@@ -115,7 +115,7 @@ def py_calc(anno=2026, supc=1317.48, smm=350.0, supi=1656.80572, scatti=0.0,
 
 IN_LABELS = {
     "anno": "Anno di paga",
-    "supc": "SUP.CONTR \u2014 superminimo CONTRATTUALE nazionale",
+    "supc": "SUP.CONTR \u2014 minimo CONTRATTUALE integrativo",
     "smm": "SMM 2016 (mensile)",
     "supi": "S.MINIMO \u2014 superminimo INDIVIDUALE personale",
     "scatti": "Scatti pre-2004 (mensile)",
@@ -271,6 +271,15 @@ CASES = [
     dict(nome="anno 2028 + oneri conguaglio", case=dict(anno=2028, oneri=530.0)),
     dict(nome="scatti pre-2004 +258,22", case=dict(scatti=258.22)),
     dict(nome="superminimi Others", case=dict(supc=1500.0, supi=2000.0, smm=0.0)),
+    dict(nome="superminimo ad personam 1.000/mese (mese pieno, pulito)", case=dict(
+        supi=1000.0, ggRet=26, ggFer=0, ggFest=0, fringe=0.0, ov=0, regRes=0,
+        comRes=0, acconto=0, arrotT=0, arrotN=0)),
+    dict(nome="superminimo ad personam 1.500/mese (mese pieno, pulito)", case=dict(
+        supi=1500.0, ggRet=26, ggFer=0, ggFest=0, fringe=0.0, ov=0, regRes=0,
+        comRes=0, acconto=0, arrotT=0, arrotN=0)),
+    dict(nome="superminimo ad personam 2.500/mese (mese pieno, pulito)", case=dict(
+        supi=2500.0, ggRet=26, ggFer=0, ggFest=0, fringe=0.0, ov=0, regRes=0,
+        comRes=0, acconto=0, arrotT=0, arrotN=0)),
     dict(nome="cedolino 03 (dirigente 03: RME 12.857, autovettura)", case=dict(
         supc=0.0, supi=7847.14, ggRet=26, ggFer=0, ggFest=1, fringe=0.0, fringeCash=261.30,
         ov=4810.85, regRes=345.82, comRes=64.12, acconto=36.43, arrotT=0.13, arrotN=0.58)),
@@ -343,7 +352,7 @@ ZUCCHETTI_03 = [
     ("ced.03: RAL 179.999,96", "RAL", 179999.96),
     ("ced.03: RAL base di contratto 5.010 x 14 = 70.140,00", "ralBase", 70140.00),
     ("ced.03: superminimo individuale annuo 109.859,96", "supiA", 109859.96),
-    ("ced.03: imponibile IRPEF annuo (RLD + autovettura x 12) = 169.474,40", "imp", 169474.40),
+    ("ced.03: imponibile IRPEF annuo (RLD + autovettura x 12) = 170.051,45 (1% IVS capato al massimale)", "imp", 170051.45),
 ]
 
 

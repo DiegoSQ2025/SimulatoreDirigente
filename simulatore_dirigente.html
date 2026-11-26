@@ -82,10 +82,10 @@
   <div class="card inputs">
    <h2>Parametri di partenza</h2>
    <div class="sezione">Il salario fisso <span class="sub">quello che entra ogni mese, prima di tasse e trattenute</span></div>
-   <label for="anno">Anno (i minimi CCNL salgono nel 2027 e 2028)</label>
-   <select id="anno"><option selected>2026</option><option>2027</option><option>2028</option></select>
+   <label for="anno">Anno + minimo contrattuale mensile lordo (art. 5 TU, aggiornato dal rinnovo 5/11/2025: il minimo era 4.340,00 € dal 1°/7/2025)</label>
+   <select id="anno"><option selected value="2026">2026 — lordo mensile 4.660,00 € (dal 1°/1/2026)</option><option value="2027">2027 — lordo mensile 4.920,00 € (dal 1°/1/2027)</option><option value="2028">2028 — lordo mensile 5.140,00 € (dal 1°/1/2028)</option></select>
    <div class="row2">
-    <div><label for="supc">Superminimo di contratto — SUP.CONTR (€/mese): deciso dal CCNL, uguale per tutti i dirigenti. È la prima voce in alto del tuo cedolino</label><input type="number" id="supc" value="1317.48"></div>
+    <div><label for="supc">Minimo contrattuale — SUP.CONTR (€/mese): voce DI CONTRATTO che si somma al minimo art. 5, stessa per tutti i dirigenti del CCNL. NON è un superminimo: l'unico superminimo è l'S.MINIMO qui sotto</label><input type="number" id="supc" value="1317.48"></div>
     <div><label for="smm">Bonus SMM 2016 (€/mese): vecchio aumento del 2016, resta fisso per tutti</label><input type="number" id="smm" value="350"></div>
    </div>
    <div class="row2">
@@ -238,7 +238,7 @@ function calc(minimo, supc, smm, supi, scatti, ggRet, ggFer, ggFest, fringe, ov,
  /* modello annuale */
  const RAL = RME * PAR.mens;
  const ivsA = Math.min(RAL, PAR.maxC)*PAR.inps;
- const aggA = Math.max(0, RAL - PAR.aggSog)*PAR.aggAlq;
+ const aggA = Math.max(0, Math.min(RAL, PAR.maxC) - PAR.aggSog)*PAR.aggAlq;  // Circ. INPS 6/2026: 1% entro il massimale 122.295
  const negriA = PAR.mnBase*PAR.mnD;
  const fasdacA = PAR.fdBase*PAR.fdD;
  const rld = RAL - ivsA - aggA - negriA;

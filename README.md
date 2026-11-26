@@ -13,7 +13,7 @@ Tool di simulazione **dal lordo al netto** per **dirigenti del CCNL Terziario, D
 | Retribuzione | MINIMO + sup.contrattuale + SMM 2016 + superminimo individuale | 4.660 + 1.317,48 + 350 + S.MINIMO → **RME 7.984,29** |
 | Retribuzione giornaliera | RME ÷ 26 (art. 4 c.6 TU) | 307,08791 |
 | Mensilità | **14** (art. 8 TU: quattordicesima giugno + tredicesima dicembre) | RAL = RME × 14 |
-| IVS INPS | 9,19% + 1% aggregativa sopra 56.224 €, massimale 122.295 (dirigenti: niente CIGS/FIS/EST) | base mensile **arrotondata all'euro** (confermato su DUE cedolini: 8.291,38→8.291,00 e 13.612,95→13.613,00: è arrotondamento, non troncamento) |
+| IVS INPS | 9,19% + 1% aggiuntiva sopra 56.224 € e **fino al massimale 122.295 €** (Circ. INPS 6/2026: oltre il massimale nessuna contribuzione IVS, 1% compreso — verificato con superminimo ad personam 1.000/1.500/2.500 €/mese; nel MESE l'1% resta dovuto come da cedolino, conguaglio annuo Zucchetti) (dirigenti: niente CIGS/FIS/EST) | base mensile **arrotondata all'euro** (confermato su DUE cedolini: 8.291,38→8.291,00 e 13.612,95→13.613,00: è arrotondamento, non troncamento) |
 | [Fondo Mario Negri](https://www.fondonegri.it/) (art. 27, previdenza compl.) | su convenzionale 59.224,54 €/anno; **dirigente 2% da 1/1/2026** (era 1%: 592,25 → 1.184,49 €/anno); **regime deroga art. 20 c.7 D.Lgs. 252/2005: deducibile senza tetto** | 98,71 €/mese |
 | [FASDAC "Mario Besusso"](https://www.fasdac.it/) (art. 29, sanità) | su convenzionale 45.940 €/anno; dirigente 1,87%; azienda 5,29% + 2,78% (aziende NON aderenti: 3,08%); non deducibile | 71,59 €/mese |
 | [Associazione A. Pastore](https://www.associazionepastore.it/) (art. 28) | dirigente 464,81 €/anno, non deducibile ma **detraibile 19% max 530 €** (L. 124/2013) a conguaglio; azienda 4.856,45 €/anno (base 4.706,45 + infortuni 560 da Q4 2025) | 38,73 €/mese |
@@ -23,7 +23,7 @@ Tool di simulazione **dal lordo al netto** per **dirigenti del CCNL Terziario, D
 
 **SUP.CONTR vs S.MINIMO — differenza chiave**
 
-- **SUP.CONTR (superminimo contrattuale nazionale)**: componente della parte *tabellare* del TU/allegato C — 1.317,48 €/mese nel cedolino 01. **Nel cedolino 03 è assente**: se la tua azienda mostra voci tipo "AUM.RETR." o "Ad Pers.", poni SUP.CONTR a 0 e sommale al campo S.MINIMO (sono componenti individuali).
+- **SUP.CONTR (minimo contrattuale integrativo)**: voce *di contratto*, si somma al MINIMO art. 5 ed è uguale per tutti i dirigenti (parte tabellare del TU/allegato C) — 1.317,48 €/mese nel cedolino 01. **Nel cedolino 03 è assente**: se la tua azienda mostra voci tipo "AUM.RETR." o "Ad Pers.", poni SUP.CONTR a 0 e sommale al campo S.MINIMO (sono componenti individuali). **NON è un superminimo**: l'unico superminimo è l'S.MINIMO.
 - **S.MINIMO (superminimo individuale)**: il superminimo *personale* negoziato tra azienda e singolo dirigente → **la variabile da inserire manualmente** (1.656,81 €/mese nel cedolino 01; 7.847,14 €/mese nel cedolino 03 = AUM.RETR. 500 + S.MINIMO 6.489,99714 + Ad Pers. 857,14286; può essere 0).
 
 La pagina mostra ora entrambe le RAL separatamente: **RAL base di contratto** = (minimo + SUP.CONTR + SMM 2016) × 14 (88.584,72 € nel cedolino 01; 70.140,00 € nel cedolino 03) e **superminimo individuale** × 14 (23.195,28 € ced.01; 109.859,96 € ced.03) → RAL di fatto 111.780,00 € (ced.01) e 179.999,96 € (ced.03). Le giornate standard del mese dirigente sono **26** (art. 4 c.6 TU: ogni giornata vale RME ÷ 26; ferie e festività le sostituiscono una a una).
@@ -93,7 +93,7 @@ node test_html.js             # suite jsdom sull'HTML
 
 ## Verifica operativa
 
-`python3 test_simulatore.py` → **TUTTI I TEST PASSATI** (11 casi, 330 confronti cella per cella, 12 soglie addizionali, 38 verifiche Zucchetti: 20 sul cedolino 01 + 18 sul cedolino 03).
+`python3 test_simulatore.py` → **TUTTI I TEST PASSATI** (14 casi, 420 confronti cella per cella, 12 soglie addizionali, 38 verifiche Zucchetti: 20 sul cedolino 01 + 18 sul cedolino 03; i casi includono superminimo ad personam a 1.000/1.500/2.500 €/mese).
 `node test_html.js` → **TUTTI I TEST HTML PASSATI** (preset cedolino 01, scenario cedolino 03, mese pulito, 26 gg, Lombardia/Milano, anno 2027, sanity NaN, accessibilità label).
 
 Benchmark (2026 Lazio/Roma, GG 25+1+1, fringe 136,40): preset cedolino netto **4.184,00**; senza conguagli netto 4.378,66 (IRPEF 2.557,41 = annua/14, addizionali rateizzate /12); mese pieno 26 gg netto 4.158,89, netto annuo 59.233,39; default RAL 111.780 → netto annuo 58.460,33 (4.175,74/mese); 2027: 60.185,43; 2028: 61.645,12.
