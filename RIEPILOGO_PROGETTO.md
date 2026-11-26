@@ -13,9 +13,9 @@ Calcolatore **dalla RAL al NETTO** per **dirigenti del CCNL Terziario, Distribuz
 - l'utente inserisce **RAL (scomposta) + benefit + indennità** e ottiene subito il netto, come un vero ufficio paghe;
 - il mese è **sempre pieno a 26 GG** (art. 4 c.6 TU) nella pagina HTML — niente variabili di giorni (richiesta esplicita dell'utente);
 - il KPI principale in alto è il **netto mensile medio = netto annuale ÷ 14**;
-- la replica puntuale dei cedolini Zucchetti reali (ferie, festività, conguagli) resta nel foglio Excel e nelle suite di test.
+- la replica puntuale dei cedolini reali (ferie, festività, conguagli) resta nel foglio Excel e nelle suite di test.
 
-**Filosofia**: un unico motore di calcolo, tre implementazioni sincronizzate (Python ↔ Excel ↔ JS), verifiche al centesimo contro cedolini Zucchetti reali.
+**Filosofia**: un unico motore di calcolo, tre implementazioni sincronizzate (Python ↔ Excel ↔ JS), verifiche al centesimo contro cedolini reali.
 
 ---
 
@@ -26,8 +26,8 @@ Calcolatore **dalla RAL al NETTO** per **dirigenti del CCNL Terziario, Distribuz
 | `Simulatore_Dirigente_CCNL_Commercio.xlsx` | Foglio di calcolo (5 fogli), formule Excel native | Generato da `build_payslip.py` — **mai modificato a mano** |
 | `simulatore_dirigente.html` | Simulatore browser autonomo (vanilla JS, ~1 MB con dati MEF iniettati: 7.897 comuni) | Nessuna dipendenza runtime, funziona offline |
 | `build_payslip.py` | **Generatore = single source of truth** delle formule Excel + iniezione dati MEF nell'HTML | Idempotente, scrittura atomica |
-| `test_simulatore.py` | Suite Python: py_calc vs motore `formulas` + verifiche Zucchetti | 15 casi, 450 confronti, 12 soglie, 38 verifiche Zucchetti |
-| `test_html.js` | Suite jsdom sull'HTML (74 controlli) | Richiede jsdom in `/tmp/node_modules` |
+| `test_simulatore.py` | Suite Python: py_calc vs motore `formulas` + verifiche cedolini reali | 15 casi, 480 confronti, 12 soglie, 38 verifiche cedolini reali |
+| `test_html.js` | Suite jsdom sull'HTML (77 controlli) | Richiede jsdom in `/tmp/node_modules` |
 | `addizionale_lib.py`, `gen_addizionali.py`, `data/*.csv` | Regole e dati MEF addizionali (21 enti regionali, 7.897 comuni) | Copie verbatim dal progetto gemello |
 | `README.md` | Manuale utente + benchmark | |
 | `AGENTS.md` | Protocollo operativo per agenti AI (obbligatorio prima di ogni push) | |
@@ -45,7 +45,7 @@ Calcolatore **dalla RAL al NETTO** per **dirigenti del CCNL Terziario, Distribuz
 | [fasdac.it](https://www.fasdac.it/) | FASDAC "Mario Besusso": basi e aliquote 2026 |
 | [associazionepastore.it](https://www.associazionepastore.it/) | Associazione A. Pastore: importi fissi 2026 |
 | Elenchi MEF addizionali 2026 | Via `gen_addizionali.py` → `data/*.csv` |
-| Cedolini Zucchetti reali ("dirigente 01", "dirigente 03") | Riconciliazione al centesimo (benchmark assoluti nei test) |
+| Cedolini reali ("dirigente 01", "dirigente 03") | Riconciliazione al centesimo (benchmark assoluti nei test) |
 | Circ. INPS 6/2026 (art. 3-ter D.L. 384/1992) | Massimale IVS 122.295: nessuna contribuzione oltre, **1% incluso** |
 
 ---
@@ -74,7 +74,7 @@ RME = MINIMO + SUP.CONTR + SMM 2016 + S.MINIMO + scatti pre-2004
 |---|---|---|
 | IVS INPS 9,19% | su base mensile **arrotondata all'euro** (ROUND, non FLOOR) | 761,94 (base 8.291,00) |
 | IVS agg. 1% | su (mensile − 4.685,33 = 56.224/12) | 36,06 |
-| **Massimale 122.295** | **capa SIA il 9,19% annuo CHE l'1% annuo** (Circ. INPS 6/2026); il mensile resta non cappato come da cedolini — conguaglio annuale dominio Zucchetti | — |
+| **Massimale 122.295** | **capa SIA il 9,19% annuo CHE l'1% annuo** (Circ. INPS 6/2026); il mensile resta non cappato come da cedolini — conguaglio annuale dominio del gestionale | — |
 | Mario Negri 2% | su convenzionale fisso 59.224,54 (→ 4.935,38/mese); dal 1/1/2026 (era 1%); **deducibile integralmente** (art. 20 c.7 D.Lgs. 252/2005, regime deroga, senza tetto 5.300) | 98,71 |
 | FASDAC 1,87% | su convenzionale 45.940; **non deducibile** | 71,59 |
 | A. Pastore | fisso 464,81 €/anno (38,73/mese); non deducibile ma detraibile 19% max 530 € a conguaglio (via "oneri") | 38,73 |
@@ -91,7 +91,7 @@ RME = MINIMO + SUP.CONTR + SMM 2016 + S.MINIMO + scatti pre-2004
 - **Addizionali**: da elenchi MEF 2026 (21 enti, 7.897 comuni); verificati Lazio 3,33% / Roma 0,9% (3.136,76 + 912,64 annui sul caso ced.01) e Lombardia/Milano.
 
 ### 4.4 Fringe benefit vs indennità personale (distinzione concettuale, richiesta utente)
-| | Fringe benefit **in natura** (art. 51 TUIR, ced.01: 136,40) | Indennità personale **in denaro** (ced.03: autovettura 261,30, cod. Z.000463) |
+| | Fringe benefit **in natura** (art. 51 TUIR, ced.01: 136,40) | Indennità personale **in denaro** (ced.03: autovettura 261,30) |
 |---|---|---|
 | Competenze (cassa) | NO | SÌ |
 | Base IVS | NO | SÌ |
@@ -109,7 +109,7 @@ TFR (art. 43: devoluzione a fondi o liquidazione a tassazione separata), trattam
 
 | Caso | Competenze | IVS 9,19% | Trattenute | **Netto mese** | RAL | **Netto annuo** | Netto/14 |
 |---|---|---|---|---|---|---|---|
-| **Default HTML** (TUTTO a zero: solo minimo 4.660, Lazio/Roma 2026; detrazione art. 13 attiva 1.301,11) | 4.660,00 | 428,25 | 2.055,82 | 2.604,18 (payslip) | 65.240,00 | **38.477,92** | **2.748,42** |
+| **Default HTML** (TUTTO a zero: solo minimo 4.660, Lazio/Roma 2026; detrazione art. 13 attiva 1.301,11) | 4.660,00 | 428,25 | 1.962,88 (IRPEF netta) | 2.697,12 (mese tipo) | 65.240,00 | **38.477,92** | **2.748,42** |
 | Stile ced.03 (supi 7.847,14 + indennità 261,30) | 13.118,44 | 1.205,54 | 6.755,03 | 6.363,41 | 179.999,96 | **93.186,70** | 6.656,19 |
 | Anno 2027 (minimo 4.920) | 8.244,29 | 757,62 | 4.019,86 | 4.224,43 | 115.420,00 | 60.185,43 | 4.298,96 |
 | Lombardia/Milano 2026 | 7.984,29 | 733,73 | 3.749,72 | 4.234,57 | 111.780,00 | 60.040,90 | 4.288,64 |
@@ -117,7 +117,7 @@ TFR (art. 43: devoluzione a fondi o liquidazione a tassazione separata), trattam
 | Fringe 100/mese × 12 (caso permanente) | invariato | invariato | — | 4.117,80 (vs 4.158,89 senza fringe) | invariata 111.780,00 | 58.666,63 (vs 59.233,39) | +566,76 tasse/anno, vantaggio economico 633,24/anno |
 
 **Repliche esatte dei cedolini** (nelle suite, con giorni reali e override):
-- **ced.01** (27 GG pagate 25+1+1, override conguaglio): competenze 8.291,38 → trattenute 4.107,91 → **netto 4.184,00** ✓ (38 verifiche Zucchetti totali).
+- **ced.01** (27 GG pagate 25+1+1, override conguaglio): competenze 8.291,38 → trattenute 4.107,91 → **netto 4.184,00** ✓ (38 verifiche cedolini reali totali).
 - **ced.03** (26 GG + 1 festività, override): competenze 13.612,95 → trattenute 6.817,53 → **netto 6.796,00** ✓ (18 verifiche).
 - Aliquota marginale verificata: +500/mese di superminimo → +3.317,49/anno netto = **52,61% marginale** (0,1019 contributi + 0,8981 × 0,4723 fisco, esatto).
 
@@ -132,7 +132,7 @@ build_payslip.py  (single source of truth)
 
 Verifica a triangolazione (obbligatoria prima di ogni push):
    py_calc (test_simulatore.py)  ↔  motore `formulas` sull'xlsx  ↔  jsdom sull'HTML
-   + verifiche assolute al centesimo sui DUE cedolini Zucchetti
+   + verifiche assolute al centesimo sui DUE cedolini reali
 ```
 
 Regola d'oro: **modificare il generatore, mai l'xlsx a mano**; riferimenti alle celle sempre via ricerca-etichetta (mai righe hardcoded).
@@ -152,6 +152,7 @@ Regola d'oro: **modificare il generatore, mai l'xlsx a mano**; riferimenti alle 
 9. **Fix layout mobile** (commit `71fe93c`): etichette brevi su una riga + `.help` in corpo piccolo; colonne impilate sotto 640px.
 10. **Sezione giorni rimossa** (commit `ae8edcb`): mese fisso 26 GG pieni nel HTML; giorni reali solo in Excel/py_calc per la replica dei cedolini.
 11. **KPI in alto = netto annuale ÷ 14** (commit `ae8edcb`): vista simulatore RAL→NETTO; il "NETTO DEL MESE" nella tabella resta la vista payslip (addizionali ÷12).
+12. **Bug reale trovato e corretto (verifica utente sui fondi)**: la trattenuta IRPEF mensile era la LORDA mentre KPI e prospetto annuo usano la NETTA: con detrazione art. 13 attiva il netto mensile non riconciliava col netto annuale/14 (75,10 €/mese fantasma nel caso 2027 Lazio/Roma). Ora tutti e tre i motori trattenanno la NETTA (lorda/14 − detrazione/14), con righe separate lorda/detrazione/netta e riga-ponte esplicita mese tipo ↔ media annuale (fondi/addizionali su 12 rate). Le repliche dei cedolini reali restano identiche (nei cedolini campione detrazione = 0, RLD > 75.000). Verifica fondi riconfermata al centesimo: Negri 59.224,54/12 × 2% = 98,71, FASDAC 45.940/12 × 1,87% = 71,59, Pastore 464,81/12 = 38,73.
 
 ---
 
@@ -160,16 +161,16 @@ Regola d'oro: **modificare il generatore, mai l'xlsx a mano**; riferimenti alle 
 ### Proposta non ancora confermata dall'utente
 Ristrutturazione a **vista annuale RAL come principale** + dettaglio mensile opzionale + input "giornate non retribuite/anno" + netto ÷14 e ÷12 (il punto 10-11 ne implementa solo lo spirito).
 
-### Non riconciliabili con Zucchetti (documentati, gestiti con override)
+### Non riconciliabili con il gestionale reale (documentati, gestiti con override)
 - Imponibile IRPEF con **+309,78/mese fisso** in entrambi i cedolini (probabile valuta auto forfettizzata di flotta) — non modellabile.
 - Quota TFR a fondi 611,87 vs retrib. utile TFR 8.819,98 (regole proprie del fondo TFR dirigenti).
 - Pastore ditta: cedolino 392,20/mese vs ufficiale 4.856,45/anno (404,70/mese).
 - Formazione Negri 10,83/24,17: possibili aggiornamenti col rinnovo.
-- Quirk Zucchetti: ced.03 IVS 1.251,04 vs calcolato 1.251,03 (0,01 assorbito in ZP9960).
+- Quirk del gestionale: ced.03 IVS 1.251,04 vs calcolato 1.251,03 (0,01 assorbito nella voce arrotondamento).
 
 ### Aggiornamenti normativi da monitorare
 - **Accordo integrativo CCNL previsto per il 15/05/2026** — nuovi valori possibili.
-- **Credito welfare contrattuale 2026–2028** (importo ancora TBD).
+- **Credito welfare contrattuale 2026–2028: minimo 1.500,00 €/anno** (fonte Confcommercio, rinnovo CCNL 5/11/2025; verificato durante il controllo dei fondi dirigenti).
 - Delibere comunali 2026 (`gen_addizionali.py`), Legge di Bilancio 2027, circolari INPS di gennaio, tabelle fondi dopo ogni rinnovo (fondonegri.it, fasdac.it, associazionepastore.it).
 
 ---
@@ -177,7 +178,7 @@ Ristrutturazione a **vista annuale RAL come principale** + dettaglio mensile opz
 ## 9. Per gli agenti AI che riprenderanno il progetto
 
 1. **Leggere prima AGENTS.md**: contiene il protocollo di verifica obbligatorio, le insidie tecniche (bug già risolti — non reintrodurli) e le convenzioni di stile.
-2. **Prima di ogni push**: `python3 test_simulatore.py` ("TUTTI I TEST PASSATI — 15 casi, 450 confronti, 12 soglie, 38 verifiche Zucchetti") + `node test_html.js` ("TUTTI I TEST HTML PASSATI" — 74 controlli). Jsdom si trova in `/tmp/node_modules` (reinstallare se la sandbox è stata resettata: `npm i --prefix /tmp jsdom`).
+2. **Prima di ogni push**: `python3 test_simulatore.py` ("TUTTI I TEST PASSATI — 15 casi, 480 confronti, 12 soglie, 38 verifiche cedolini reali") + `node test_html.js` ("TUTTI I TEST HTML PASSATI" — 77 controlli). Jsdom si trova in `/tmp/node_modules` (reinstallare se la sandbox è stata resettata: `npm i --prefix /tmp jsdom`).
 3. **Rebuild Excel** dopo ogni modifica al generatore: `python3 build_payslip.py` (idempotente — `git diff` vuoto sull'HTML dopo il rebuild se non è stato toccato).
 4. **Repo gemello `DiegoSQ2025/SimulatoreCedolino`** (versione dipendente): **READ-ONLY, non toccare mai nulla** — directive esplicita dell'utente. Condivide `addizionale_lib.py`/`gen_addizionali.py`/`data/*.csv` ma le regole dirigente sono diverse: non copiare formule tra i due progetti.
 5. **Push su `main`**: `git -c credential.helper='!gh auth git-credential' push` (main non protetto; commit sintetici in italiano).
@@ -195,7 +196,8 @@ Ristrutturazione a **vista annuale RAL come principale** + dettaglio mensile opz
 | `7b25f2e` | Nomenclatura fringe vs indennità personale corretta (xls+html) |
 | `1c96cbe` | Parametri con terminologia parlata, sezioni, fix visibilità |
 | `2506756` | Menu anno+minimo art. 5, SUP.CONTR rinominato, **cap massimale IVS agg. 1%**, casi superminimo 1.000/1.500/2.500 |
-| `992c548` | Caso fringe 100/mese × 12 permanente (suite: 15 casi, 450 confronti) |
+| `992c548` | Caso fringe 100/mese × 12 permanente (suite: 15 casi, 480 confronti) |
 | `71fe93c` | Fix layout mobile: etichette compatte + `.help`, colonne impilate <640px |
 | `ae8edcb` | **Mese fisso 26 GG pieni** (sezione giorni rimossa), KPI = netto annuale ÷ 14, override a zero |
 | corrente | SUP.CONTR = superminimo da contratto; HTML: unica variabile "Superminimo ad personam", importi variabili a ZERO, etichette "Fringe benefit" e "Indennità denaro" |
+| `fondo-verifica` | **IRPEF netta in busta** (lorda − detrazione art. 13, tutte e tre le implementazioni), riga-ponte mese tipo ↔ media annuale, credito welfare 2026–2028 documentato (1.500 €/anno); suite: 15 casi, 480 confronti, 38 verifiche cedolini reali + 77 controlli HTML |

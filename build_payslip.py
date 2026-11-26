@@ -6,7 +6,7 @@ Single source of truth delle formule Excel: non modificare l'xlsx a mano.
 Genera anche il blocco dati comuni/regioni (elenchi MEF 2026) dentro
 simulatore_dirigente.html tra i marker __COMUNI_DATA__ (vedi inject_html_data).
 
-Regole dirigente derivate dal cedolino Zucchetti (Dirig.Terz. livello 5,
+Regole dirigente derivate dai cedolini reali forniti (Dirig.Terz. livello 5,
 Lazio/Roma, IVS 9,19% + agg 1%) e dal TU CCNL Dirigenti Terziario 12/4/2023:
 - RME = MINIMO + SUP.CONTR + SMM 2016 + S.MINIMO; retribuzione giornaliera =
   mensile/26 (art. 4 c. 6 TU); 14 mensilita' = 13a dicembre + 14a giugno (art. 8).
@@ -18,8 +18,9 @@ Lazio/Roma, IVS 9,19% + agg 1%) e dal TU CCNL Dirigenti Terziario 12/4/2023:
 - FASDAC "Mario Besusso" (base 45.940): dip 1,87%, azienda 5,29%+2,78% pensionati.
 - A. Pastore: dirigente 464,81/anno (non deducibile, detraibile 19% max 530 a
   conguaglio); azienda da cedolino 392,20/mese (ufficiale 4.856,45/anno).
-- IRPEF lorda per mensilita' = IRPEF annua a scaglioni / 14 (verificata sul
-  cedolino: 38.580,79/14 = 2.755,77).
+- IRPEF: lorda annua a scaglioni / 14; la trattenuta in busta e' la NETTA
+  (lorda/14 meno detrazione art. 13 annua/14; nei cedolini campione la
+  detrazione e' 0 perche' RLD > 75.000, per cui lorda = netta).
 """
 import os
 
@@ -130,7 +131,7 @@ lines = [
     ("   RAL di fatto = RAL base di contratto (minimo + SUP.CONTR + SMM 2016) x 14 + S.MINIMO x 14 (+ scatti).", None),
     ("4. Foglio 'Confronto anni': minimi CCNL 2026/2027/2028 con gli stessi parametri.", None),
     ("", None),
-    ("REGOLE DIRIGENTE (TU CCNL Dirigenti + cedolino Zucchetti di riferimento)", "h"),
+    ("REGOLE DIRIGENTE (TU CCNL Dirigenti + cedolini reali di riferimento)", "h"),
     ("- Retribuzione mensile in 4 voci: MINIMO CCNL tabellare (4.660,00 dal 1/1/2026), superminimo da", None),
     ("  contratto (SUP.CONTR), SMM 2016 (350,00) e superminimo individuale (S.MINIMO): 4.660+1.317,48+350+1.656,81 = 7.984,29.", None),
     ("- 26 son le GIORNATE STANDARD del mese dirigente (art. 4 c. 6 TU): retribuzione giornaliera = mensile/26;", None),
@@ -139,12 +140,13 @@ lines = [
     ("- Scatti di anzianita' abrogati dal 1/7/2004: resta solo il +258,22 dei premi pre-2004 (art. 9 TU).", None),
     ("- IVS: 9,19% sull'imponibile + 1% sulla quota annua sopra 56.224 \u20ac e fino al massimale 122.295 \u20ac", None),
     ("  (Circ. INPS 6/2026: oltre il massimale NESSUNA contribuzione IVS, 1% compreso; nel mese l'1% resta", None),
-    ("  dovuto come da cedolino Zucchetti, che liquida mensilmente e conguaglia in anno).", None),
+    ("  dovuto come da cedolino reale, che liquida mensilmente e conguaglia in anno).", None),
     ("  Per i dirigenti NON si applicano CIGS, FIS bilaterale e Fondo EST (assenti nel cedolino).", None),
     ("- IRPEF 2026: 23% fino a 28.000 \u20ac, 33% da 28.000 a 50.000 \u20ac, 43% oltre (L. 199/2025); detrazione", None),
     ("  art. 13 TUIR come per i dipendenti. L'imponibile dirigente e' sopra 75.000 \u20ac: nessuna somma", None),
     ("  integrativa del cuneo L. 207/2024 ne il trattamento integrativo (fuori fascia).", None),
-    ("- IRPEF lorda del MESE = IRPEF annua a scaglioni / 14 (verificata: cedolino 38.580,79/14 = 2.755,77).", None),
+    ("- IRPEF del MESE = trattenuta NETTA: lorda annua/14 meno detrazione art. 13 annua/14 (cedolino:", None),
+    ("  38.580,79/14 = 2.755,77, detrazione 0 per RLD > 75.000: lorda = netta nel cedolino campione).", None),
     ("- Fondo Mario Negri (previdenza complementare, deroga art. 20 c. 7 D.Lgs. 252/2005): contributi su base", None),
     ("  convenzionale 59.224,54 \u20ac/anno; dirigente 2% (= 98,71/mese), azienda 12,86% + 2,52% integrativo.", None),
     ("  DEDUCIBILE dal reddito per intero, senza tetto di 5.164,46 \u20ac.", None),
@@ -159,20 +161,20 @@ lines = [
     ("- FRINGE BENEFIT (art. 51 TUIR) vs INDENNITA' DENARO: due voci distinte e diverse.", None),
     ("  Fringe in natura (es. 136,40 del ced.01): beneficio in specie, tassabile SOLO a IRPEF: non e'", None),
     ("  incassato, fuori dalle competenze e dalla base IVS (dentro pero' la base TFR). Indennita' denaro", None),
-    ("  (es. autovettura 261,30 del ced.03, voce Z.000463): NON e' un fringe benefit", None),
+    ("  (es. autovettura 261,30 del ced.03): NON e' un fringe benefit", None),
     ("  bensi' un emolumento/compensazione monetaria (spesso opt-out dell'auto aziendale): entra in", None),
     ("  competenze, base IVS, IRPEF e base TFR come lo stipendio.", None),
     ("- ADDIZIONALI: menu REGIONE (21 enti MEF) e COMUNE (7.897 comuni, dati 2026); modellate aliquote uniche e", None),
     ("  a scaglioni, soglie di esenzione, regole speciali Lazio/Umbria/FVG/VdA/Trento/Bolzano.", None),
     ("", None),
-    ("CONCILIAZIONE COL CEDOLINO ZUCCHETTI (benchmark esatto)", "h"),
+    ("CONCILIAZIONE COL CEDOLINO REALE (benchmark esatto)", "h"),
     ("- TOTALE COMPETENZE 8.291,38 = round2(307,08791 x 25) + round2(x 1 ferie) + round2(x 1 festivita');", None),
     ("- trattenute 4.107,91 = IVS 761,94 + agg 36,06 + Negri 98,71 + FASDAC 71,59 + Pastore 38,73 + formazione", None),
     ("  10,83 + IRPEF 2.755,77 + add.reg residuo 253,95 + add.com residuo 52,97 + acconto 27,33 + arrotond. 0,03;", None),
     ("- NETTO 4.184,00 = 8.291,38 \u2212 4.107,91 + arrotondato netto 0,53. I residui di addizionali (saldi 2025) e", None),
     ("  l'acconto 2026 sono input facoltativi: ponili a zero per un mese 'pulito'.", None),
     ("- L'imponibile IRPEF del cedolino (7.704,45 x 14 = 107.862,30) non e' ricostruibile in modo deterministico", None),
-    ("  con questo modello: Zucchetti annualizza con elementi di conguaglio propri (differenza ~586 \u20ac/mese sul", None),
+    ("  con questo modello: il gestionale paghe annualizza con elementi di conguaglio propri (differenza ~586 \u20ac/mese sul", None),
     ("  calcolo automatico). Per replicare il cedolino inserisci l'IRPEF lorda del mese 2.755,77 come override.", None),
     ("", None),
     ("SECONDO CEDOLINO DI VERIFICA (dirigente 03, stesso datore, superminimo molto piu' alto)", "h"),
@@ -185,7 +187,7 @@ lines = [
     ("  Pastore 38,73; formazione 10,83; IRPEF lorda 4.810,85 (override); add.reg 345,82; add.com 64,12;", None),
     ("  acconto 36,43; arrotond. 0,13 -> TOTALE TRATTENUTE 6.817,53; NETTO 6.796,00 = 13.612,95 - 6.817,53", None),
     ("  + 0,58. RAL 180.000 = base contratto 5.010 x 14 (= 70.140) + personale 7.847,14 x 14 (= 109.859,96).", None),
-    ("  Nei due cedolini Zucchetti aggiunge un FISSO di 309,78/mese all'imponibile IRPEF (probabile valuta", None),
+    ("  Nei due cedolini reali aggiunge un FISSO di 309,78/mese all'imponibile IRPEF (probabile valuta", None),
     ("  auto forfettizzata della flotta aziendale): non modellabile, coperto dall'override IRPEF lorda.", None),
     ("", None),
     ("FONTI E VIGENZA", "h"),
@@ -452,22 +454,22 @@ r = put(ws, r, "Giorni festivita'/permessi", 1, "Z01138", None, True)
 c_ggfest = r - 1
 r = put(ws, r, "Fringe benefit (mensile)", 136.4, "voce in natura: tassabile, non e' flusso di cassa", MONEY, True)
 c_fringe = r - 1
-r = put(ws, r, "Indennita' denaro (mensile)", 0.0, "emolumento in DENARO, NON fringe ben. art. 51: come Z.000463 ced.03 (261,30) = compensazione monetaria/opt-out auto; entra in competenze, IVS, IRPEF e base TFR", MONEY, True)
+r = put(ws, r, "Indennita' denaro (mensile)", 0.0, "emolumento in DENARO, NON fringe ben. art. 51: come la voce indennita' del ced.03 (261,30) = compensazione monetaria/opt-out auto; entra in competenze, IVS, IRPEF e base TFR", MONEY, True)
 c_fringeCash = r - 1
 
 r += 1
 r = section(ws, r, "OVERRIDE DA CEDOLINO (0 = calcolo automatico del modello annuale)", 3)
-r = put(ws, r, "IRPEF lorda del mese \u2014 override", 2755.77, "cedolino F02010; 0 = IRPEF annua/14 di questo foglio", MONEY, True)
+r = put(ws, r, "IRPEF lorda del mese \u2014 override", 2755.77, "voce IRPEF del cedolino; 0 = IRPEF annua/14 di questo foglio", MONEY, True)
 c_irpov = r - 1
-r = put(ws, r, "Add. regionale del mese \u2014 residuo conguaglio", 253.95, "cedolino F09110 (saldo 2025 Lazio); 0 = rateizzata", MONEY, True)
+r = put(ws, r, "Add. regionale del mese \u2014 residuo conguaglio", 253.95, "voce addiz. regionale del cedolino (saldo 2025 Lazio); 0 = rateizzata", MONEY, True)
 c_regres = r - 1
-r = put(ws, r, "Add. comunale del mese \u2014 residuo conguaglio", 52.97, "cedolino F09130 (saldo 2025 Roma); 0 = rateizzata", MONEY, True)
+r = put(ws, r, "Add. comunale del mese \u2014 residuo conguaglio", 52.97, "voce addiz. comunale del cedolino (saldo 2025 Roma); 0 = rateizzata", MONEY, True)
 c_comres = r - 1
-r = put(ws, r, "Acconto addizionali extra (da cedolino)", 27.33, "cedolino F09140 (acconto 2026 Roma)", MONEY, True)
+r = put(ws, r, "Acconto addizionali extra (da cedolino)", 27.33, "voce acconto addizionali del cedolino (2026 Roma)", MONEY, True)
 c_acconto = r - 1
-r = put(ws, r, "Arrotondamento trattenute (Zucchetti)", 0.03, "voce ZP9960; 0 = niente", MONEY, True)
+r = put(ws, r, "Arrotondamento trattenute (cedolino)", 0.03, "voce arrotondamento del cedolino; 0 = niente", MONEY, True)
 c_arrotT = r - 1
-r = put(ws, r, "Arrotondamento netto (Zucchetti)", 0.53, "pie' pagina cedolino; 0 = niente", MONEY, True)
+r = put(ws, r, "Arrotondamento netto (cedolino)", 0.53, "pie' pagina cedolino; 0 = niente", MONEY, True)
 c_arrotN = r - 1
 r = put(ws, r, "Altri oneri/detrazioni annuali (es. 19% Pastore, max 530)", 0.0, "detrazioni a conguaglio, assenti nel cedolino", MONEY, True)
 c_oneri = r - 1
@@ -483,34 +485,40 @@ r = put(ws, r, "Ferie godute (gg x retr. giornaliera)", f"=ROUND($B${c_ggfer}*$B
 c_fer = r - 1
 r = put(ws, r, "Festivita'/permessi (gg x retr. giornaliera)", f"=ROUND($B${c_ggfest}*$B${c_giorn},2)", "Z01138", MONEY)
 c_fest = r - 1
-r = put(ws, r, "Indennita' denaro", f"=$B${c_fringeCash}", "ced.03: 261,30 in cassa (Z.000463): retribuzione piena, non fringe ben.", MONEY)
+r = put(ws, r, "Indennita' denaro", f"=$B${c_fringeCash}", "ced.03: 261,30 in cassa: retribuzione piena, non fringe ben.", MONEY)
 c_frcc = r - 1
 r = put(ws, r, "TOTALE COMPETENZE", f"=B{c_ret}+B{c_fer}+B{c_fest}+B{c_fringeCash}", "cedolino 8.291,38; cedolino 03: 13.612,95", MONEY, False, True)
 c_comp = r - 1
-r = put(ws, r, "\u2212 Contributo IVS 9,19%", f"=ROUND(ROUND(B{c_comp},0)*{P['INPS']},2)", "Z00000: base ARROTONDATA all'euro (ced.01 8.291,38->8.291,00; ced.03 13.612,95->13.613,00)", MONEY)
+r = put(ws, r, "\u2212 Contributo IVS 9,19%", f"=ROUND(ROUND(B{c_comp},0)*{P['INPS']},2)", "base ARROTONDATA all'euro (ced.01 8.291,38->8.291,00; ced.03 13.612,95->13.613,00)", MONEY)
 c_ivsm = r - 1
-r = put(ws, r, "\u2212 Contributo IVS agg. 1%", f"=ROUND(MAX(0,ROUND(B{c_comp},0)-{P['AGG_SOG']}/12)*{P['AGG_ALQ']},2)", "Z00010: base ced.03 13.613,00 -> 8.928,00 x 1% = 89,28", MONEY)
+r = put(ws, r, "\u2212 Contributo IVS agg. 1%", f"=ROUND(MAX(0,ROUND(B{c_comp},0)-{P['AGG_SOG']}/12)*{P['AGG_ALQ']},2)", "base ced.03 13.613,00 -> 8.928,00 x 1% = 89,28", MONEY)
 c_aggm = r - 1
-r = put(ws, r, "\u2212 Fondo Mario Negri 2% (base convenzionale)", f"=ROUND({P['MN_BASE']}/12*{P['MN_D']},2)", "Z20100: 59.224,54/12 x 2% = 98,71", MONEY)
+r = put(ws, r, "\u2212 Fondo Mario Negri 2% (base convenzionale)", f"=ROUND({P['MN_BASE']}/12*{P['MN_D']},2)", "59.224,54/12 x 2% = 98,71", MONEY)
 c_negrim = r - 1
-r = put(ws, r, "\u2212 FASDAC 1,87% (base convenzionale)", f"=ROUND({P['FD_BASE']}/12*{P['FD_D']},2)", "Z31055: 45.940/12 x 1,87% = 71,59", MONEY)
+r = put(ws, r, "\u2212 FASDAC 1,87% (base convenzionale)", f"=ROUND({P['FD_BASE']}/12*{P['FD_D']},2)", "45.940/12 x 1,87% = 71,59", MONEY)
 c_fasdaqm = r - 1
 r = put(ws, r, "\u2212 A. Pastore quota dirigente", f"={P['AP_M']}", "464,81/12 = 38,73", MONEY)
 c_pastm = r - 1
 r = put(ws, r, "\u2212 Fondo formazione Mario Negri", f"={P['MNF_DIP']}", "quota fissa 10,83", MONEY)
 c_formm = r - 1
-r = put(ws, r, "IRPEF lorda a debito del mese", f"=IF($B${c_irpov}>0,$B${c_irpov},0)", "F02010; override attivo se > 0, altrimenti annua/14 (INPUT nell'apposita riga sopra)", MONEY)
+r = put(ws, r, "IRPEF lorda del mese (annua/14)", f"=IF($B${c_irpov}>0,$B${c_irpov},0)", "override attivo se > 0, altrimenti annua/14 (INPUT nell'apposita riga sopra)", MONEY)
+c_irplm = r - 1
+ws.cell(row=c_irplm, column=2).value = None  # formula definitiva assegnata dopo (dipende da IRPEF annua)
+r = put(ws, r, "Detrazione lavoro dip. art. 13 del mese (annua/14)", "=0", "0 con override: i cedolini campione (RLD > 75.000) non hanno detrazione", MONEY)
+c_dedm = r - 1
+ws.cell(row=c_dedm, column=2).value = None
+r = put(ws, r, "IRPEF netta del mese", "=0", "lorda \u2212 detrazione: e' la trattenuta IRPEF reale in busta", MONEY)
 c_irpm = r - 1
-ws.cell(row=c_irpm, column=2).value = None  # formula definitiva assegnata dopo (dipende da IRPEF annua)
-r = put(ws, r, "\u2212 Addizionale regionale del mese", f"=IF($B${c_regres}>0,$B${c_regres},0)", "F09110: residuo o rateizzata (INPUT nell'apposita riga sopra)", MONEY)
+ws.cell(row=c_irpm, column=2).value = None
+r = put(ws, r, "\u2212 Addizionale regionale del mese", f"=IF($B${c_regres}>0,$B${c_regres},0)", "residuo o rateizzata (INPUT nell'apposita riga sopra)", MONEY)
 c_regm = r - 1
 ws.cell(row=c_regm, column=2).value = None
-r = put(ws, r, "\u2212 Addizionale comunale del mese", "=0", "F09130: residuo o rateizzata", MONEY)
+r = put(ws, r, "\u2212 Addizionale comunale del mese", "=0", "residuo o rateizzata", MONEY)
 c_comm = r - 1
 ws.cell(row=c_comm, column=2).value = None
-r = put(ws, r, "\u2212 Acconto addizionali extra", f"=$B${c_acconto}", "F09140: trattenuta additiva del mese", MONEY)
+r = put(ws, r, "\u2212 Acconto addizionali extra", f"=$B${c_acconto}", "trattenuta additiva del mese", MONEY)
 c_accm = r - 1
-r = put(ws, r, "\u2212 Arrotondamento trattenute", f"=$B${c_arrotT}", "ZP9960", MONEY)
+r = put(ws, r, "\u2212 Arrotondamento trattenute", f"=$B${c_arrotT}", "voce arrotondamento del cedolino", MONEY)
 r = put(ws, r, "TOTALE TRATTENUTE", f"=B{c_ivsm}+B{c_aggm}+B{c_negrim}+B{c_fasdaqm}+B{c_pastm}+B{c_formm}+B{c_irpm}+B{c_regm}+B{c_comm}+B{c_accm}+$B${c_arrotT}", "cedolino: 4.107,91", MONEY, False, True)
 c_tratt = r - 1
 r = put(ws, r, "NETTO DEL MESE", f"=B{c_comp}-B{c_tratt}+B{c_arrotN}", "cedolino: 4.184,00 (8.291,38 \u2212 4.107,91 + 0,53)", MONEY, False, True)
@@ -525,7 +533,7 @@ r = put(ws, r, "RAL \u2014 retribuzione annua effettiva (base di contratto + S.M
 c_RAL = r - 1
 r = put(ws, r, "IVS 9,19% annua (fino al massimale)", f"=MIN($B${c_RAL},{P['MAXC']})*{P['INPS']}", "", MONEY)
 c_ivsa = r - 1
-r = put(ws, r, "IVS agg. 1% annua (sopra 56.224, entro massimale)", f"=MAX(0,MIN($B${c_RAL},{P['MAXC']})-{P['AGG_SOG']})*{P['AGG_ALQ']}", "Circ. INPS 6/2026: oltre il massimale 122.295 nessuna contribuzione IVS (1% compreso); il MESE resta come da cedolino (conguaglio annuo Zucchetti)", MONEY)
+r = put(ws, r, "IVS agg. 1% annua (sopra 56.224, entro massimale)", f"=MAX(0,MIN($B${c_RAL},{P['MAXC']})-{P['AGG_SOG']})*{P['AGG_ALQ']}", "Circ. INPS 6/2026: oltre il massimale 122.295 nessuna contribuzione IVS (1% compreso); il MESE resta come da cedolino (conguaglio annuo del gestionale paghe)", MONEY)
 c_agga = r - 1
 r = put(ws, r, "Fondo Mario Negri 2% annuo (base convenzionale)", f"={P['MN_BASE']}*{P['MN_D']}", "deducibile per intero (regime deroga)", MONEY)
 c_negria = r - 1
@@ -540,13 +548,15 @@ r = put(ws, r, "Imponibile IRPEF annuo (RLD + fringe natura x 12 + indennita' de
 c_imp = r - 1
 r = put(ws, r, "IRPEF lorda annua", f"=IF($B${c_imp}<={P['S1']},$B${c_imp}*{P['A1']},{P['S1']}*{P['A1']}+IF($B${c_imp}<={P['S2']},($B${c_imp}-{P['S1']})*{P['A2']},({P['S2']}-{P['S1']})*{P['A2']}+($B${c_imp}-{P['S2']})*{P['A3']}))", "L. 199/2025: 23/33/43%", MONEY)
 c_irpla = r - 1
-ws.cell(row=c_irpm, column=2).value = f"=IF($B${c_irpov}>0,$B${c_irpov},ROUND($B${c_irpla}/{P['MENS']},2))"
+ws.cell(row=c_irplm, column=2).value = f"=IF($B${c_irpov}>0,$B${c_irpov},ROUND($B${c_irpla}/{P['MENS']},2))"
 r = put(ws, r, "Oneri/detrazioni annuali (input)", f"=$B${c_oneri}", "riducono l'imposta netta a conguaglio", MONEY)
 c_dedon = r - 1
 r = put(ws, r, "Detrazione lavoro dipendente (art. 13 TUIR)", f"=IF($B${c_rld}<={P['DS1']},{P['D1']},IF($B${c_rld}<={P['DS2']},{P['DB']}+{P['DINC']}*({P['DS2']}-$B${c_rld})/{P['DDIV2']},IF($B${c_rld}<={P['DS3']},{P['DB']},IF($B${c_rld}<={P['DS4']},{P['DB']}*({P['DS4']}-$B${c_rld})/{P['DDIV4']},0))))", "sul reddito di riferimento RLD", MONEY)
 c_ded = r - 1
 r = put(ws, r, "Detrazione effettiva (capienza imposta)", f"=MIN($B${c_ded},$B${c_irpla})", "", MONEY)
 c_dede = r - 1
+ws.cell(row=c_dedm, column=2).value = f"=IF($B${c_irpov}>0,0,ROUND($B${c_dede}/{P['MENS']},2))"
+ws.cell(row=c_irpm, column=2).value = f"=ROUND(B{c_irplm}-B{c_dedm},2)"
 r = put(ws, r, "IRPEF NETTA annua", f"=MAX(0,$B${c_irpla}-$B${c_dede}-$B${c_dedon})", "", MONEY, False, True)
 c_irpna = r - 1
 r = put(ws, r, "Addizionale regionale annua", reg_add_xls(f"$B${c_imp}"), "regola MEF della regione scelta", MONEY)

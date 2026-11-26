@@ -97,7 +97,7 @@
    <div class="sezione">Benefit e indennità <span class="sub">da inserire a mano: sono i vantaggi che non figgono tra le voci fisse</span></div>
    <div class="row2">
     <div><label for="fringe">Fringe benefit (€/mese) <span class="help">vantaggio in natura (es. auto aziendale): tasse sì, cassa e IVS no</span></label><input type="number" id="fringe" value="0"></div>
-    <div><label for="fringeCash">Indennità denaro (€/mese) <span class="help">paga vera in conto (es. opt-out auto, Z.000463): netto, IVS e base TFR</span></label><input type="number" id="fringeCash" value="0"></div>
+    <div><label for="fringeCash">Indennità denaro (€/mese) <span class="help">paga vera in conto (es. opt-out auto): netto, IVS e base TFR</span></label><input type="number" id="fringeCash" value="0"></div>
    </div>
    <div class="sezione">Dove paghi le tasse <span class="sub">serve per le addizionali IRPEF regionale e comunale</span></div>
    <div class="row2">
@@ -109,7 +109,7 @@
    <label><input type="checkbox" id="custom" style="width:auto"> Digito a mano le percentuali delle addizionali</label>
    <div class="pct">regionale % <input type="number" id="regPct" value="1.73" step="0.01" aria-label="Aliquota addizionale regionale %">
     · comunale % <input type="number" id="comPct" value="0.90" step="0.01" aria-label="Aliquota addizionale comunale %"></div>
-   <div class="sezione">Numeri veri del cedolino <span class="sub">AVANZATO: compila solo se vuoi ricalcare un cedolino Zucchetti reale al centesimo; se valgono 0 il simulatore calcola da solo</span></div>
+   <div class="sezione">Numeri veri del cedolino <span class="sub">AVANZATO: compila solo se vuoi ricalcare un cedolino reale al centesimo; se valgono 0 il simulatore calcola da solo</span></div>
    <div class="row2">
     <div><label for="irpOv">IRPEF lorda del mese (dal cedolino)</label><input type="number" id="irpOv" value="0"></div>
     <div><label for="regRes">Residuo 2025 add. regionale <span class="help">saldo dell’anno prima, pagato nell’anno dopo</span></label><input type="number" id="regRes" value="0"></div>
@@ -125,8 +125,8 @@
    <p class="hint">Il mese dirigente è sempre pieno: 26 giornate retribuite (art. 4 c.6 TU) — ferie e
    festività sono retribuite e non spostano la paga. Tutti gli importi variabili partono da zero: inserisci
    superminimo, SMM, fringe benefit e indennità denaro. I campi "Numeri veri del cedolino" servono solo per
-   ricalcare un cedolino Zucchetti reale. Fringe benefit vs indennità denaro: il primo è in natura, tassabile
-   ma non è flusso di cassa né contributivo; la seconda (come Z.000463 del cedolino 03) è retribuzione piena:
+   ricalcare un cedolino reale. Fringe benefit vs indennità denaro: il primo è in natura, tassabile
+   ma non è flusso di cassa né contributivo; la seconda (autovettura in denaro del cedolino 03) è retribuzione piena:
    competenze, IVS, IRPEF e base TFR.</p>
   </div>
 
@@ -135,7 +135,7 @@
    <div class="card"><h2>Prospetto annuale <span class="sub">14 mensilità, modello a scaglioni</span></h2><table id="annuale"></table></div>
    <div class="card"><h2>Confronto minimi CCNL <span class="sub">2026–2028, stessi parametri</span></h2><table id="confronto"></table></div>
    <p class="disclaimer">Strumento di simulazione a scopo informativo: non sostituisce il cedolino ufficiale né un
-   parere di consulente del lavoro. Le regole sono riconciliate al centesimo con DUE cedolini Zucchetti
+   parere di consulente del lavoro. Le regole sono riconciliate al centesimo con DUE cedolini reali
    dirigente reali (verifica completa nel foglio Excel e nelle suite di test). L'imponibile IRPEF del
    gestionale usa conguagli propri non ricostruibili da qui: usa l'override IRPEF se lo conosci.</p>
   </div>
@@ -152,7 +152,7 @@ const COMUNI=["Abruzzo|Abbateggio|PE|u|0.0050,1000000000000000|0.0000,1000000000
 
 /* ---- Minimi CCNL dirigente (rinnovo 5/11/2025): [anno, minimo mensile] ---- */
 const TAB3 = [[2026, 4660.0], [2027, 4920.0], [2028, 5140.0]];
-/* ---- Parametri 2026 (riconciliati con il cedolino Zucchetti dirigente liv.5 Lazio/Roma) ---- */
+/* ---- Parametri 2026 (riconciliati con i cedolini reali dirigente liv.5 Lazio/Roma) ---- */
 const PAR = {inps:0.0919, aggSog:56224, aggAlq:0.01, maxC:122295, mens:14, ng:26,
  mnBase:59224.54, mnD:0.02, mnD12:0.1286, mnD2A:0.0252, mnfDip:10.83, mnfDit:24.17,
  fdBase:45940, fdD:0.0187, fdD12:0.0529, fdD2A:0.0278,
@@ -310,8 +310,11 @@ function run(){
  notaComEl.textContent = notaCom ? "Comune — "+notaCom : "";
  notaComEl.className = notaCom ? "chip warn" : "chip";
 
- /* voci mensili: override residui se > 0, altrimenti rateizzazione annua */
- const irpm = ov>0 ? ov : r2(r.irpl/PAR.mens);
+ /* voci mensili: override residui se > 0, altrimenti rateizzazione annua.
+    La trattenuta IRPEF in busta è la NETTA: lorda annua/14 meno detrazione art. 13 annua/14
+    (nei cedolini campione la detrazione è 0 perché RLD > 75.000, per questo il bug non era emerso). */
+ const irplM = r2(r.irpl/PAR.mens), dedM = r2(r.dede/PAR.mens);
+ const irpm = ov>0 ? ov : r2(irplM-dedM);
  const regM = regRes>0 ? regRes : r2(A.reg/12);
  const comM = comRes>0 ? comRes : r2(A.com/12);
  const tratt = r.ivsM+r.aggM+r.negriM+r.fasdacM+r.pastM+r.formM+irpm+regM+comM+acconto+arrotT;
@@ -335,13 +338,20 @@ function run(){
  row(tM,["− FASDAC 1,87% (base 45.940/12)",eur(-r.fasdacM)]);
  row(tM,["− A. Pastore quota dirigente (464,81/12)",eur(-r.pastM)]);
  row(tM,["− Fondo formazione Mario Negri",eur(-r.formM)]);
- row(tM,["− IRPEF lorda"+(ov>0?" (override cedolino)":" (annua/14)"),eur(-irpm)]);
+ if(ov>0) row(tM,["− IRPEF del mese (override cedolino)",eur(-ov)]);
+ else {
+  row(tM,["− IRPEF lorda (annua/14)",eur(-irplM)]);
+  row(tM,["+ Detrazione lavoro dip. art. 13 TUIR",eur(dedM)]);
+  row(tM,["− IRPEF netta (annua/14)",eur(-irpm)]);
+ }
  row(tM,["− Addizionale regionale"+(regRes>0?" (residuo conguaglio)":""),eur(-regM)]);
  row(tM,["− Addizionale comunale"+(comRes>0?" (residuo conguaglio)":""),eur(-comM)]);
  row(tM,["− Acconto addizionali extra",eur(-acconto)]);
- row(tM,["− Arrotondamento trattenute (ZP9960)",eur(-arrotT)]);
+ row(tM,["− Arrotondamento trattenute (cedolino)",eur(-arrotT)]);
  rowTot(tM,["= TOTALE TRATTENUTE",eur(tratt)]);
  rowTot(tM,["= NETTO DEL MESE",eur(nettoM)]);
+ const bridge = nettoA/PAR.mens - nettoM;
+ rowInfo(tM,["Mese tipo: fondi e addizionali sono trattenuti solo su 12 rate (nella 13ª e 14ª busta non ci sono): la media annuale " + eur(nettoA/PAR.mens) + " è " + eur(bridge) + " più alta del mese tipo"," "]);
  rowInfo(tM,["Fringe benefit",eur(fringe)]);
  rowInfo(tM,["Mese dirigente: 26 GG standard (art. 4 c.6 TU: ogni giornata = RME ÷ 26); ferie e festività le sostituiscono",""]);
 
@@ -366,7 +376,7 @@ function run(){
  row(tA,["Addizionale comunale annua",eur(A.com)]);
  rowTot(tA,["NETTO ANNUO in busta",eur(r.RAL-(r.ivsA+r.aggA+r.negriA+r.fasdacA+PAR.apAnn+r.formM*12+r.irpn+A.reg+A.com)),'tot']);
  row(tA,["Netto medio per mensilità (annuo / 14)",eur(nettoA/PAR.mens)]);
- rowInfo(tA,["Nota: l'imponibile IRPEF del cedolino Zucchetti (7.704,45 × 14 = 107.862,30) annualizza conguagli propri:",
+ rowInfo(tA,["Nota: l'imponibile IRPEF del cedolino reale (7.704,45 × 14 = 107.862,30) annualizza conguagli propri:",
              ""]);
  rowInfo(tA,["per replicare quel cedolino usa l'override \"IRPEF lorda del mese\" = 2.755,77.",
              ""]);
