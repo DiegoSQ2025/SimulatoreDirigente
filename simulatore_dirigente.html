@@ -60,6 +60,28 @@
  tr.tot td:first-child{color:var(--accent)}
  tr.info td{color:var(--muted);font-style:italic;font-size:.8rem}
  .disclaimer{font-size:.76rem;color:var(--muted);font-style:italic;margin-top:14px;line-height:1.5}
+ .toolbar{display:flex;justify-content:flex-end;margin-bottom:4px}
+ #btnPdf{background:var(--accent);color:#fff;border:none;border-radius:10px;
+  padding:9px 16px;font:inherit;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+ #btnPdf:hover{filter:brightness(1.08)}
+ #btnPdf:focus{outline:2px solid var(--accent-soft)}
+ .print-only{display:none}
+ @media print{
+  @page{margin:12mm}
+  body{background:#fff;font-size:12px}
+  header,.inputs,.toolbar,.hint,.chip{display:none!important}
+  .print-only{display:block;margin:0 0 12px}
+  .print-only h1{font-size:1.15rem;margin:0 0 3px;color:#000}
+  .print-only .pd{margin:0;color:#333;font-size:.82rem;line-height:1.4}
+  .wrap{max-width:none;margin:0;padding:0}
+  .grid{display:block;margin-top:10px}
+  .card{box-shadow:none;border:1px solid #bbb;break-inside:avoid;margin-bottom:10px;padding:10px 12px}
+  .kpi{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
+  .kpi.hero{background:#fff;color:var(--ink);border:2px solid var(--accent)}
+  .kpi.hero .k{color:var(--muted)}
+  td,th{font-size:.78rem;padding:5px 4px}
+  #confronto td,#confronto th{font-size:.6rem;padding:3px 2px}
+ }
 </style>
 </head>
 <body>
@@ -75,6 +97,11 @@
 </header>
 
 <div class="wrap">
+ <div class="toolbar"><button id="btnPdf" type="button">Esporta in PDF / Stampa</button></div>
+ <div class="print-only" id="printHead">
+  <h1>Simulatore Cedolino Dirigente — dal lordo al netto</h1>
+  <p class="pd" id="printParam"></p>
+ </div>
  <div class="kpi-grid">
   <div class="kpi hero"><div class="k">Netto mensile medio (annuale ÷ 14)</div><div class="v" id="kpiNettoM">—</div><div class="k" id="kpiNote" style="font-weight:400;opacity:.85;line-height:1.35">—</div></div>
   <div class="kpi"><div class="k">Totale trattenute del mese</div><div class="v" id="kpiTratt">—</div></div>
@@ -394,8 +421,22 @@ function run(){
   const nc=c.RAL-(c.ivsA+c.aggA+c.negriA+c.fasdacA+PAR.apAnn+c.formM*12+irpnC+aa.reg+aa.com);
   row(tC,[String(anno),eur(min),eur(c.RME),eur(c.RAL),eur(c.ivsA+c.aggA),eur(c.negriA+c.fasdacA),eur(c.imp),eur(irpnC),eur(aa.reg),eur(aa.com),eur(nc),eur(nc/PAR.mens)]);
  });
+
+ const annoTxt=document.getElementById('anno').selectedOptions[0].text;
+ const regTxt=selReg.options[selReg.selectedIndex].text;
+ const comTxt=selCom.options[selCom.selectedIndex].text;
+ document.getElementById('printParam').textContent =
+  'Simulazione del ' + new Date().toLocaleDateString('it-IT') +
+  ' — ' + annoTxt + ' · SMM 2016 ' + eur(smm) +
+  ' · Superminimo ad personam ' + eur(supi) +
+  ' · Anzianità pre-2004 ' + eur(scatti) +
+  ' · Fringe benefit ' + eur(fringe) + ' · Indennità denaro ' + eur(fringeCash) +
+  ' · ' + regTxt + ' / ' + comTxt +
+  (custom ? ' (aliquote manuali ' + regPct + '%/' + comPct + '%)' : '') +
+  ' · 26 GG retribuiti (art. 4 c.6 TU)';
 }
 initMenu();
+document.getElementById('btnPdf').addEventListener('click',()=>window.print());
 document.querySelectorAll("input,select").forEach(el=>el.addEventListener("input",run));
 selReg.addEventListener("input",()=>{ popolaComuni(null); run(); });
 selCom.addEventListener("input",run);

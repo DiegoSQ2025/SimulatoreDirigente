@@ -29,6 +29,8 @@ Tool di simulazione **dal lordo al netto** per **dirigenti del CCNL Terziario, D
 
 La pagina mostra le RAL in righe separate: **RAL base di contratto** = (minimo tabellare + SMM 2016) × 14 (65.240,00 € con solo il minimo 2026) e **superminimo ad personam** × 14 (ced.01: 41.640,00 € = 2.974,29 × 14; ced.03: 109.859,96 €) → RAL di fatto 111.780,00 € (ced.01) e 179.999,96 € (ced.03). Le giornate standard del mese dirigente sono **26** (art. 4 c.6 TU: ogni giornata vale RME ÷ 26; ferie e festività le sostituiscono una a una). Nel simulatore HTML il mese è sempre pieno a 26 GG — sezione giorni rimossa su richiesta: le simulazioni partono da **RAL + benefit + indennità** come un vero ufficio paghe; la replica puntuale dei cedolini reali (ferie, festività, conguagli) resta nel foglio Excel e nelle suite di test. Il KPI in alto mostra il **netto mensile medio = netto annuale ÷ 14**; la tabella mensile mostra la vista payslip con la **trattenuta IRPEF NETTA** (lorda annua ÷14 − detrazione art. 13 annua ÷14) e una riga-ponte che spiega la differenza con la media annuale: fondi e addizionali sono trattenuti solo su 12 rate, quindi nella 13ª e 14ª busta il netto è più alto.
 
+**Esportazione PDF**: il tasto **«Esporta in PDF / Stampa»** (in alto a destra) apre il dialogo di stampa del browser (scegliere «Salva come PDF»): il PDF è un report pulito senza il pannello parametri, con intestazione di data + riepilogo di tutti i parametri inseriti, i 4 KPI e le tre tabelle. Implementato con stampa nativa + foglio di stampa dedicato: niente librerie esterne, funziona anche offline.
+
 **Fringe benefit (art. 51 TUIR) e indennità personale in denaro: due voci concettualmente diverse**, entrambe variabili manuali:
 
 - **fringe benefit in natura** (136,40 €/mese nel cedolino 01): beneficio in specie (art. 51), tassabile a IRPEF ma **non incassato** — fuori dalle competenze e dalla base IVS (entra però nella base TFR);
@@ -105,7 +107,7 @@ node test_html.js             # suite jsdom sull'HTML
 ## Verifica operativa
 
 `python3 test_simulatore.py` → **TUTTI I TEST PASSATI** (15 casi, 480 confronti cella per cella, 12 soglie addizionali, 59 verifiche benchmark reali: 20 ced.01 + 18 ced.03 + 21 elaborazione controllo 2027 netto 44.000; i casi includono superminimo ad personam a 1.000/1.500/2.500 €/mese).
-`node test_html.js` → **TUTTI I TEST HTML PASSATI** (preset cedolino 01, scenario cedolino 03, mese pulito, 26 gg, Lombardia/Milano, anno 2027, sanity NaN, accessibilità label).
+`node test_html.js` → **TUTTI I TEST HTML PASSATI** (preset cedolino 01, scenario cedolino 03, mese pulito, 26 gg, Lombardia/Milano, anno 2027, sanity NaN, accessibilità label, tasto export PDF/stampa).
 
 Benchmark (2026 Lazio/Roma, GG 25+1+1, fringe 136,40): preset cedolino netto **4.184,00**; senza conguagli netto 4.378,66 (IRPEF 2.557,41 = annua/14, addizionali rateizzate /12); mese pieno 26 gg netto 4.158,89, netto annuo 59.233,39; default RAL 111.780 → netto annuo 58.460,33 (4.175,74/mese); 2027: 60.185,43; 2028: 61.645,12.
 

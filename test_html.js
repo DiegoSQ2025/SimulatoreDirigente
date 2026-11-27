@@ -130,6 +130,15 @@ check('Lombardia/Milano: kpi netto mensile medio (60.040,90/14)', kpi('kpiNettoM
 set('regione', 'Lazio'); set('comune', 'Roma');
 check('ritorno Lazio/Roma: kpi netto mensile medio', kpi('kpiNettoM'), 4175.74);
 
+/* tasto export PDF/stampa: bottone + intestazione di stampa che riporta i parametri inseriti */
+check('pulsante esporta PDF/stampa presente', get('btnPdf') && /Esporta/i.test(get('btnPdf').textContent) ? 1 : 0, 1, 0);
+check('intestazione di stampa presente e nascosta a schermo', get('printHead') && /(^|\s)print-only(\s|$)/.test(get('printHead').className) ? 1 : 0, 1, 0);
+const pp = get('printParam').textContent;
+check('intestazione di stampa: anno, regione, comune correnti', /2026/.test(pp) && /Lazio/.test(pp) && /Roma/.test(pp) ? 1 : 0, 1, 0);
+set('supi', '550.11117');
+check('intestazione di stampa si aggiorna col superminimo', /550,11/.test(get('printParam').textContent) ? 1 : 0, 1, 0);
+set('supi', '2974.28572');
+
 /* sanity: nessun NaN/undefined/Infinity nelle tabelle e nei KPI */
 let bad = 0;
 document.querySelectorAll('#mensile tr, #annuale tr, #confronto tr').forEach(tr => {

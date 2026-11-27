@@ -27,7 +27,7 @@ Calcolatore **dalla RAL al NETTO** per **dirigenti del CCNL Terziario, Distribuz
 | `simulatore_dirigente.html` | Simulatore browser autonomo (vanilla JS, ~1 MB con dati MEF iniettati: 7.897 comuni) | Nessuna dipendenza runtime, funziona offline |
 | `build_payslip.py` | **Generatore = single source of truth** delle formule Excel + iniezione dati MEF nell'HTML | Idempotente, scrittura atomica |
 | `test_simulatore.py` | Suite Python: py_calc vs motore `formulas` + verifiche benchmark reali | 15 casi, 480 confronti, 12 soglie, 59 verifiche benchmark reali |
-| `test_html.js` | Suite jsdom sull'HTML (77 controlli) | Richiede jsdom in `/tmp/node_modules` |
+| `test_html.js` | Suite jsdom sull'HTML (81 controlli) | Richiede jsdom in `/tmp/node_modules` |
 | `addizionale_lib.py`, `gen_addizionali.py`, `data/*.csv` | Regole e dati MEF addizionali (21 enti regionali, 7.897 comuni) | Copie verbatim dal progetto gemello |
 | `README.md` | Manuale utente + benchmark | |
 | `AGENTS.md` | Protocollo operativo per agenti AI (obbligatorio prima di ogni push) | |
@@ -180,7 +180,7 @@ Ristrutturazione a **vista annuale RAL come principale** + dettaglio mensile opz
 ## 9. Per gli agenti AI che riprenderanno il progetto
 
 1. **Leggere prima AGENTS.md**: contiene il protocollo di verifica obbligatorio, le insidie tecniche (bug già risolti — non reintrodurli) e le convenzioni di stile.
-2. **Prima di ogni push**: `python3 test_simulatore.py` ("TUTTI I TEST PASSATI — 15 casi, 480 confronti, 12 soglie, 59 verifiche benchmark reali") + `node test_html.js` ("TUTTI I TEST HTML PASSATI" — 77 controlli). Jsdom si trova in `/tmp/node_modules` (reinstallare se la sandbox è stata resettata: `npm i --prefix /tmp jsdom`).
+2. **Prima di ogni push**: `python3 test_simulatore.py` ("TUTTI I TEST PASSATI — 15 casi, 480 confronti, 12 soglie, 59 verifiche benchmark reali") + `node test_html.js` ("TUTTI I TEST HTML PASSATI" — 81 controlli). Jsdom si trova in `/tmp/node_modules` (reinstallare se la sandbox è stata resettata: `npm i --prefix /tmp jsdom`).
 3. **Rebuild Excel** dopo ogni modifica al generatore: `python3 build_payslip.py` (idempotente — `git diff` vuoto sull'HTML dopo il rebuild se non è stato toccato).
 4. **Repo gemello `DiegoSQ2025/SimulatoreCedolino`** (versione dipendente): **READ-ONLY, non toccare mai nulla** — directive esplicita dell'utente. Condivide `addizionale_lib.py`/`gen_addizionali.py`/`data/*.csv` ma le regole dirigente sono diverse: non copiare formule tra i due progetti.
 5. **Push su `main`**: `git -c credential.helper='!gh auth git-credential' push` (main non protetto; commit sintetici in italiano).
@@ -203,4 +203,5 @@ Ristrutturazione a **vista annuale RAL come principale** + dettaglio mensile opz
 | `ae8edcb` | **Mese fisso 26 GG pieni** (sezione giorni rimossa), KPI = netto annuale ÷ 14, override a zero |
 | corrente | SUP.CONTR = superminimo da contratto; HTML: unica variabile "Superminimo ad personam", importi variabili a ZERO, etichette "Fringe benefit" e "Indennità denaro" |
 | `fondo-verifica` | **IRPEF netta in busta** (lorda − detrazione art. 13, tutte e tre le implementazioni), riga-ponte mese tipo ↔ media annuale, credito welfare 2026–2028 documentato (1.500 €/anno); suite: 15 casi, 480 confronti, 38 verifiche cedolini reali + 77 controlli HTML |
+| `export-pdf` | Tasto **«Esporta in PDF / Stampa»** nell'HTML: stampa nativa `window.print()` + foglio `@media print` dedicato — report pulito senza pannello parametri, con intestazione data + riepilogo parametri inseriti (`#printParam`), 4 KPI e tre tabelle; zero dipendenze, funziona offline; suite a **81 controlli HTML** |
 | `sim27` | Terzo benchmark: elaborazione di controllo gennaio 2027 (netto target 44.000) replicata — regole condivise confermate al centesimo; differenze spiegate (FASDAC/Pastore/detrazione omesse dall'allegato); suite: 59 verifiche benchmark reali |
